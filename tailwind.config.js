@@ -2,10 +2,10 @@
 module.exports = {
   darkMode: ["class"],
   content: [
-    './pages/**/*.{js,jsx}',
-    './components/**/*.{js,jsx}',
-    './app/**/*.{js,jsx}',
-    './src/**/*.{js,jsx}',
+    "./pages/**/*.{js,jsx}",
+    "./components/**/*.{js,jsx}",
+    "./app/**/*.{js,jsx}",
+    "./src/**/*.{js,jsx}",
   ],
   prefix: "",
   theme: {
@@ -17,6 +17,15 @@ module.exports = {
       },
     },
     extend: {
+      fontFamily: {
+        sigmar_one: "var(--sigmar_one)",
+        satisfy: "var(--Satisfy)",
+        rubik: "var(--Rubik)",
+        fraunces_600: "var(--Fraunces600)",
+        fraunces_semibold: "var(--FrauncesSemibold)",
+        fraunces_bold: "var(--Frauncesbold)",
+        fraunces: "var(--Fraunces)",
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
@@ -74,4 +83,4 @@ module.exports = {
     },
   },
   plugins: [require("tailwindcss-animate")],
-}
+};
