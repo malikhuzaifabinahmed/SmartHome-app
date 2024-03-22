@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 export default function ShowError({ type, children, className }) {
   if (type) {
     return (
-      <div className={cn("text-red-500 text-sm", className)}>
+      <div className={cn("text-red-500 text-sm  ", className)}>
         {type && errors[type]}
       </div>
     );

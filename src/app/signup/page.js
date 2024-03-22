@@ -10,6 +10,7 @@ export default async function Page() {
         additionalText={
           "If you have any questions or want any further information, drop us a message and our team will get back to you as soon as possible."
         }
+        cardClass={"rounded-[24px]"}
       >
         <SignupForm />
       </SinglePageLayout>

@@ -67,6 +67,11 @@ module.exports = {
         sm: "calc(var(--radius) - 4px)",
       },
       keyframes: {
+        slide: {
+          from: { width: 0, height: 0 },
+          to: { width: "100%", height: "100%" },
+        },
+
         "accordion-down": {
           from: { height: "0" },
           to: { height: "var(--radix-accordion-content-height)" },
@@ -77,6 +82,7 @@ module.exports = {
         },
       },
       animation: {
+        slideIn: "slide 2s ease-out ",
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
       },

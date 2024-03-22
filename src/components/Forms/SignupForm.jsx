@@ -6,6 +6,9 @@ import * as Yup from "yup";
 import InputField from "../ui/InputField";
 import { RotateCw } from "lucide-react";
 import MyButton from "../ui/MyButton";
+import { Formik, useFormik } from "formik";
+import { toast } from "sonner";
+
 export default function SignupForm() {
   const [isLoading, setIsloading] = useState(false);
   const initialValues = {
@@ -17,24 +20,34 @@ export default function SignupForm() {
   };
 
   const validationSchema = Yup.object({
-    first_name: Yup.string().required("First Name is required"),
-    last_name: Yup.string().required("Last Name is required"),
-    email: Yup.string().email("Invalid email address").required("Required"),
-    password: Yup.string()
-      .min(6, "Password must be at least 6 characters")
-      .required("Password is required"),
+    first_name: Yup.string().required("emptyField"),
+    last_name: Yup.string().required("emptyField"),
+    email: Yup.string().email("Invalid email address").required("emptyField"),
+    password: Yup.string().min(8, "passwordStrength").required("emptyField"),
     password_confirmation: Yup.string()
-      .oneOf([Yup.ref("password"), null], "Passwords must match")
-      .required("Confirm Password is required"),
+      .oneOf([Yup.ref("password"), null], "passwordMismatch")
+      .required("emptyField"),
   });
 
   const onSubmit = (values) => {
     dispatch(registerUser(values));
   };
 
+  const formik = useFormik({
+    initialValues,
+    validationSchema,
+    onSubmit: (values) => {
+      setIsloading(true);
+      toast("Successful sign up.");
+      console.log(values);
+    },
+  });
   return (
-    <form className="flex flex-col gap-5 my-10 w-full">
-      <div className="mx-auto w-full flex flex-col gap-5 px-5 max-w-sm">
+    <form
+      action={formik.handleSubmit}
+      className="flex flex-col  gap-5 mb-10 w-full"
+    >
+      <div className="mx-auto w-full flex flex-col gap-5 px-10 ">
         <div className="grid w-full max-w-md  items-center gap-1.5">
           <InputField
             label="First Name"
@@ -42,6 +55,14 @@ export default function SignupForm() {
             id="first_name"
             placeholder="First Name"
             name="first_name"
+            onBlur={formik.handleBlur}
+            onChange={formik.handleChange}
+            value={formik.values.first_name}
+            error={
+              formik.touched.first_name &&
+              formik.errors.first_name &&
+              formik.errors.first_name
+            }
           />
         </div>
         <div className="grid w-full max-w-md  items-center gap-1.5">
@@ -51,6 +72,14 @@ export default function SignupForm() {
             id="last_name"
             placeholder="Last Name"
             name="last_name"
+            onBlur={formik.handleBlur}
+            onChange={formik.handleChange}
+            value={formik.values.last_name}
+            error={
+              formik.touched.last_name &&
+              formik.errors.last_name &&
+              formik.errors.last_name
+            }
           />
         </div>
         <div className="grid w-full max-w-md  items-center gap-1.5">
@@ -60,6 +89,12 @@ export default function SignupForm() {
             id="email"
             placeholder="Email"
             name="email"
+            onBlur={formik.handleBlur}
+            onChange={formik.handleChange}
+            value={formik.values.email}
+            error={
+              formik.touched.email && formik.errors.email && formik.errors.email
+            }
           />
         </div>
         <div className="grid w-full max-w-md items-center gap-1.5">
@@ -68,6 +103,15 @@ export default function SignupForm() {
             type="password"
             id="password"
             placeholder="Enter Your Password"
+            name={"password"}
+            onBlur={formik.handleBlur}
+            onChange={formik.handleChange}
+            value={formik.values.password}
+            error={
+              formik.touched.password &&
+              formik.errors.password &&
+              formik.errors.password
+            }
           />
         </div>
         <div className="grid w-full max-w-md items-center gap-1.5">
@@ -75,13 +119,22 @@ export default function SignupForm() {
             label="Confirm Password"
             type="password"
             id="password_confirmation"
+            name={"password_confirmation"}
             placeholder="Confirm Password"
+            onBlur={formik.handleBlur}
+            onChange={formik.handleChange}
+            value={formik.values.password_confirmation}
+            error={
+              formik.touched.password_confirmation &&
+              formik.errors.password_confirmation &&
+              formik.errors.password_confirmation
+            }
           />
         </div>
 
-        <MyButton className=" min-[320px]:w-[246px] self-center">
+        <MyButton type="submit" className=" min-[320px]:w-[246px] self-center">
           {isLoading && <RotateCw className="mr-2 h-4 w-4 animate-spin" />}
-          Sign up
+          {!isLoading && "Sign up"}
         </MyButton>
         <div className="text-xs self-end">
           Already have an account?

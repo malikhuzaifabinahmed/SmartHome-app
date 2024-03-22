@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import Image from "next/image";
 import Link from "next/link";
 
 function SinglePageLayout({
@@ -22,15 +23,11 @@ function SinglePageLayout({
       }}
       className={cn("min-h-screen w-full flex  ", className)}
     >
-      <div className="w-full py-20 px-3 sm:px-20">
+      <div className="w-full pt-32 py-20 px-3 sm:px-20">
         {showLogo && (
-          <div>
+          <div className="relative max-sm:hidden size-28 mx-auto">
             <Link href={"/"}>
-              <img
-                className="h-10 mx-auto mb-10"
-                alt=""
-                src={"/images/nestoblack.png"}
-              />
+              <Image fill className="mx-auto  mb-10" alt="" src={"/logo.png"} />
             </Link>
           </div>
         )}
