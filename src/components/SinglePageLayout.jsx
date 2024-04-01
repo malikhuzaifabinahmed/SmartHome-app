@@ -18,7 +18,7 @@ function SinglePageLayout({
       style={{
         background:
           backgroundImage ||
-          "linear-gradient(110.56deg, rgba(147, 241, 251, 0.2) 12.99%, rgba(80, 131, 254, 0.2) 88.67%)",
+          "linear-gradient(150.56deg, rgba(150, 241, 251, 0.2) 12.99%, rgba(80, 131, 254, 0.2) 88.67%)",
         backgroundPosition: "center",
       }}
       className={cn("min-h-screen w-full flex  ", className)}
