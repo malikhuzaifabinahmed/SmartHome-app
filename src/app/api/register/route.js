@@ -2,38 +2,55 @@
 
 import { NextResponse } from "next/server.js"
 
+
 __dirname = '/home/malik/hlf/fabric-samples/test-network/a'
-export async function POST(request) {
-    console.log("enter")
-    const  { Gateway, Wallets } = require("fabric-network");
+
+const { Gateway, Wallets } = require("fabric-network");
 const FabricCAServices = require("fabric-ca-client");
-const path = require ("path");
+const path = require("path");
 const {
   buildCAClient,
   registerAndEnrollUser,
   enrollAdmin,
-} = require ("../../../../../hlf/fabric-samples/test-application/javascript/CAUtil.js");
+} = require("../../../../../hlf/fabric-samples/test-application/javascript/CAUtil.js");
 const {
   buildCCPOrg1,
   buildWallet,
-} = require ("../../../../../hlf/fabric-samples/test-application/javascript/AppUtil.js");
+} = require("../../../../../hlf/fabric-samples/test-application/javascript/AppUtil.js");
 
 
-    const channelName = process.env.CHANNEL_NAME || "identitymangement";
-    const chaincodeName = process.env.CHAINCODE_NAME || "basic";
-    
-    const mspOrg1 = "Org1MSP";  
-    const walletPath = path.join('/home/malik/SmartHome-app/src/app/api/register/', "wallet");
-    const org1UserId = "javascriptAppUser";
-    
-    
-    const ccp = buildCCPOrg1();
-    const caClient = buildCAClient(FabricCAServices, ccp, 'ca.org1.example.com');
-    console.log("able to enroll admin")
+const channelName = process.env.CHANNEL_NAME || "identitymangement";
+const chaincodeName = process.env.CHAINCODE_NAME || "identity2";
+console.log("chain code name given")
+const mspOrg1 = "Org1MSP";
+const walletPath = path.join('/home/malik/SmartHome-app/src/app/api/register/', "wallet");
+const org1UserId = "javascriptAppUser";
 
-    const wallet = await buildWallet(Wallets, walletPath);
-    await enrollAdmin(caClient, wallet, mspOrg1);
-    await registerAndEnrollUser(caClient, wallet, mspOrg1, org1UserId, 'org1.department1');
+
+const ccp = buildCCPOrg1();
+console.log("buid cc po org1")
+
+const caClient = buildCAClient(FabricCAServices, ccp, 'ca.org1.example.com');
+console.log("able to enroll admin")
+
+__dirname = '/home/malik/SmartHome-app/src/app/api/register/'
+
+
+
+let wallet;
+
+
+  buildWallet(Wallets, walletPath).then((res) => {
+wallet =res;
+    enrollAdmin(caClient, res, mspOrg1).then(() => {
+      registerAndEnrollUser(caClient, wallet, mspOrg1, org1UserId, 'org1.department1');
+    })
+
+  })
+
+
+
+export async function POST(request) {
     const gateway = new Gateway();
     await gateway.connect(ccp, {
       wallet,

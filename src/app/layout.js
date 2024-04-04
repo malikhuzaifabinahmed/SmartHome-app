@@ -1,3 +1,4 @@
+import createInitialWallet from "@/actions/Authenticate";
 import "./globals.css";
 import Header from "@/components/Header";
 import { Toaster } from "@/components/ui/sonner";
@@ -17,7 +18,7 @@ export const metadata = {
   description: "Smart Home with HLF",
 };
 
-export default function RootLayout({ children }) {
+export default async function RootLayout({ children }) {
   return (
     <html lang="en">
       <body

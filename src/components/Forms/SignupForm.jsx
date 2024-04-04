@@ -8,6 +8,8 @@ import { RotateCw } from "lucide-react";
 import MyButton from "../ui/MyButton";
 import { Formik, useFormik } from "formik";
 import { toast } from "sonner";
+import { register } from "@/actions/Authenticate";
+import {setCookies }from "@/actions/cookiesManger";
 
 export default function SignupForm() {
   const [isLoading, setIsloading] = useState(false);
@@ -22,23 +24,35 @@ export default function SignupForm() {
   const validationSchema = Yup.object({
     first_name: Yup.string().required("emptyField"),
     last_name: Yup.string().required("emptyField"),
-    email: Yup.string().email("Invalid email address").required("emptyField"),
+    email: Yup.string().email("invalidEmail").required("emptyField"),
     password: Yup.string().min(8, "passwordStrength").required("emptyField"),
     password_confirmation: Yup.string()
       .oneOf([Yup.ref("password"), null], "passwordMismatch")
       .required("emptyField"),
   });
 
-  const onSubmit = (values) => {
-    dispatch(registerUser(values));
-  };
+  
 
   const formik = useFormik({
     initialValues,
     validationSchema,
-    onSubmit: (values) => {
+    onSubmit: async (values) => {
+
       setIsloading(true);
-      toast("Successful sign up.");
+     
+     try {
+      let response = await register({ firstName: values.first_name, lastName: values.last_name, email: values.email, password: values.password,role:"user"})
+    await setCookies({name:"refreshToken", value:response.refreshToken})
+     localStorage.setItem("refreshToken", response.refreshToken)
+     toast("Successful Sign up.");
+     setIsloading(false);
+
+     } catch (error) {
+      toast("Something went wrong!");
+     setIsloading(false);
+
+     }
+      
       console.log(values);
     },
   });
