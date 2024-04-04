@@ -2,7 +2,7 @@
 
 import { NextResponse } from "next/server.js"
 
-
+__dirname = '/home/malik/hlf/fabric-samples/test-network/a'
 export async function POST(request) {
     console.log("enter")
     const  { Gateway, Wallets } = require("fabric-network");
@@ -23,13 +23,14 @@ const {
     const chaincodeName = process.env.CHAINCODE_NAME || "basic";
     
     const mspOrg1 = "Org1MSP";  
-    const walletPath = path.join(__dirname, "wallet");
+    const walletPath = path.join('/home/malik/SmartHome-app/src/app/api/register/', "wallet");
     const org1UserId = "javascriptAppUser";
     
-    console.log("able to enroll admin")
     
     const ccp = buildCCPOrg1();
     const caClient = buildCAClient(FabricCAServices, ccp, 'ca.org1.example.com');
+    console.log("able to enroll admin")
+
     const wallet = await buildWallet(Wallets, walletPath);
     await enrollAdmin(caClient, wallet, mspOrg1);
     await registerAndEnrollUser(caClient, wallet, mspOrg1, org1UserId, 'org1.department1');
