@@ -9,7 +9,7 @@ import MyButton from "../ui/MyButton";
 import { Formik, useFormik } from "formik";
 import { toast } from "sonner";
 import { register } from "@/actions/Authenticate";
-import {setCookies }from "@/actions/cookiesManger";
+import { setCookies } from "@/actions/cookiesManger";
 
 export default function SignupForm() {
   const [isLoading, setIsloading] = useState(false);
@@ -31,29 +31,28 @@ export default function SignupForm() {
       .required("emptyField"),
   });
 
-  
-
   const formik = useFormik({
     initialValues,
     validationSchema,
     onSubmit: async (values) => {
-
       setIsloading(true);
-     
-     try {
-      let response = await register({ firstName: values.first_name, lastName: values.last_name, email: values.email, password: values.password,role:"user"})
-    await setCookies({name:"refreshToken", value:response.refreshToken})
-     localStorage.setItem("refreshToken", response.refreshToken)
-     toast("Successful Sign up.");
-     setIsloading(false);
 
-     } catch (error) {
-      toast("Something went wrong!");
-     setIsloading(false);
+      try {
+        let response = await register({
+          firstName: values.first_name,
+          lastName: values.last_name,
+          email: values.email,
+          password: values.password,
+          role: "user",
+        });
 
-     }
-      
-      console.log(values);
+        localStorage.setItem("refreshToken", response.refreshToken);
+        toast("Successful Sign up.");
+        setIsloading(false);
+      } catch (error) {
+        toast("Something went wrong!");
+        setIsloading(false);
+      }
     },
   });
   return (

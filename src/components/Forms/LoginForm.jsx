@@ -13,6 +13,7 @@ import InputField from "../ui/InputField";
 import MyButton, { myButtonVariants } from "../ui/MyButton";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { loginUser } from "@/actions/Authenticate";
 export default function LoginForm() {
   const [submitClicked, setSubmitClicked] = useState(false);
   const [isForgotPasswordClicked, setIsForgotPasswordClicked] = useState(false);
@@ -32,9 +33,20 @@ export default function LoginForm() {
   const formik = useFormik({
     initialValues,
     validationSchema,
-    onSubmit: (values) => {
+    onSubmit: async (values) => {
       setIsloading(true);
-      toast("Successful login");
+      try {
+        let response = await loginUser({
+          email: values.email,
+          password: values.password,
+        });
+        localStorage.setItem("refreshToken", response.refreshToken);
+        toast("Successful login");
+        setIsloading(false);
+      } catch (error) {
+        toast("Something went wrong!");
+        setIsloading(false);
+      }
       console.log(values);
     },
   });
