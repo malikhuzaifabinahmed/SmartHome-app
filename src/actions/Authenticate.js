@@ -1,7 +1,6 @@
 "use server";
 
 import { cookies } from "next/headers";
-import { redirect } from "next/navigation.js";
 
 __dirname = "/home/malik/hlf/fabric-samples/test-network/a";
 
@@ -145,7 +144,6 @@ export async function authenticateUser({ email }) {
 
     let response = JSON.parse(result.toString());
 
-    cookies().set("accessToken", response.accessToken);
 
     return response;
   } catch (e) {

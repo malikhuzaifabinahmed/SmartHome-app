@@ -1,10 +1,11 @@
+'use client'
 
-"use server"
-import { getCooKies } from "@/actions/cookiesManger";
-import { authenticateUser } from "@/actions/serverAuthenticatel";
+import { authenticateUser } from "@/actions/Authenticate";
+import { getCooKies, setCookies } from "@/actions/cookiesManger";
+import { useEffect } from "react";
 
-export default async function layout({ children }) {
-    let refreshToken = await getCooKies({ name: "refreshToken" });
+export default function AccessManager(){
+  useEffect(()=>{async  function check (){let refreshToken = await getCooKies({ name: "refreshToken" });
     if (refreshToken) {
         let accessToken = await getCooKies({ name: "accessToken" });
         if (!accessToken) {
@@ -18,18 +19,14 @@ export default async function layout({ children }) {
                 let jsonUserData =  await JSON.parse(userData.value);
                 console.log(jsonUserData)
                 let response = await authenticateUser({ email: jsonUserData.email });
-                console.log("response",response)
-                // setCookies({name:"accessToken", value:response.accessToken});
+                console.log(response)
+                setCookies({name:"accessToken", value:response.accessToken});
 
             }
 
 
         }
-        
-
-        return <>
-            {children}</>
-
-    }
-
+    }}
+    check()})
+return ;
 }
