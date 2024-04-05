@@ -1,6 +1,7 @@
 "use server";
 
 import { cookies } from "next/headers";
+import { redirect } from "next/navigation.js";
 
 __dirname = "/home/malik/hlf/fabric-samples/test-network/a";
 
@@ -34,6 +35,7 @@ const caClient = buildCAClient(FabricCAServices, ccp, "ca.org1.example.com");
 console.log("able to enroll admin");
 
 __dirname = "/home/malik/SmartHome-app/src/actions/";
+const oneDay = 24 * 60 * 60 * 1000;
 
 export default async function createInitialWallet() {
   buildWallet(Wallets, walletPath).then((wallet) => {
@@ -106,13 +108,13 @@ export async function loginUser({ email, password }) {
     cookies().set("refreshToken", response.refreshToken, {
       maxAge: oneDay * 7,
     });
-    cookies().set("userData", {
+    cookies().set("userData", JSON.stringify({
       email: response.email,
       role: response.role,
       firstName: response.firstName,
       lastName: response.lastName,
-    });
-
+    }));
+    
     return response;
   } catch (e) {
     console.log("Error at login ", e);
@@ -143,7 +145,6 @@ export async function authenticateUser({ email }) {
 
     let response = JSON.parse(result.toString());
 
-    const oneDay = 24 * 60 * 60 * 1000;
     cookies().set("accessToken", response.accessToken);
 
     return response;

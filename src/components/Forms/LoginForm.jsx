@@ -42,7 +42,9 @@ export default function LoginForm() {
         });
         localStorage.setItem("refreshToken", response.refreshToken);
         toast("Successful login");
+        router.push('/dashboard');
         setIsloading(false);
+       
       } catch (error) {
         toast("Something went wrong!");
         setIsloading(false);

@@ -1,7 +1,13 @@
+import { getCooKies } from "@/actions/cookiesManger";
 import LoginForm from "@/components/Forms/LoginForm";
 import SinglePageLayout from "@/components/SinglePageLayout";
+import { redirect } from "next/navigation";
 
 export default async function Page() {
+  let refreshToken = await getCooKies({name:"refreshToken"});
+  if(refreshToken){
+    redirect("/dashboard")
+  }
   return (
     <>
       <SinglePageLayout

@@ -4,8 +4,12 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 import MaxWidthWrapper from "./MaxWidthWrapper";
 import { myButtonVariants } from "./ui/MyButton";
+import { getCooKies } from "@/actions/cookiesManger";
+import { User2 } from "lucide-react";
 
-export default function Header() {
+export default async function Header() {
+  let refreshToken = await getCooKies({name:"refreshToken"});
+ 
   return (
     <MaxWidthWrapper
       className={
@@ -26,7 +30,7 @@ export default function Header() {
             />
           </div>
         </Link>
-        <Link
+      {!refreshToken &&  <Link
           href={"/login"}
           className={cn(
             "bg-secondary/40",
@@ -34,7 +38,8 @@ export default function Header() {
           )}
         >
           Login
-        </Link>
+        </Link>}
+        {refreshToken && <User2/>}
       </div>
     </MaxWidthWrapper>
   );
