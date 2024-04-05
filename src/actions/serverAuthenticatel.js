@@ -17,7 +17,7 @@ const chaincodeName = process.env.CHAINCODE_NAME || "identity2";
   );
   const org1UserId = "javascriptAppUser";
   const ccp = buildCCPOrg1();
-export async function authenticateUser({ email }) {
+  export async function authenticateUser({ email }) {
     let wallet = await buildWallet(Wallets, walletPath);
     const gateway = new Gateway();
     await gateway.connect(ccp, {
@@ -32,17 +32,17 @@ export async function authenticateUser({ email }) {
     if (!refreshToken) {
       return { message: "User is not signed in!" };
     }
-  
+    console.log(refreshToken.value)
     try {
       let result = await contract.submitTransaction(
         "authenticateUser",
         email,
-        refreshToken
+        refreshToken.value
       );
   
       let response = JSON.parse(result.toString());
+      cookies().set({ name: "accesToken", value: response.accessToken })
   
-        console.log(response)
       return response;
     } catch (e) {
       console.log("Error at authenticateUser ", e);

@@ -3,7 +3,8 @@
 import { cookies } from "next/headers";
 
 __dirname = "/home/malik/hlf/fabric-samples/test-network/a";
-
+import jwt from "jsonwebtoken"
+import { deleteCookies, setCookies } from "./cookiesManger.js";
 const { Gateway, Wallets } = require("fabric-network");
 const FabricCAServices = require("fabric-ca-client");
 const path = require("path");
@@ -113,7 +114,7 @@ export async function loginUser({ email, password }) {
       firstName: response.firstName,
       lastName: response.lastName,
     }));
-    
+
     return response;
   } catch (e) {
     console.log("Error at login ", e);
@@ -134,19 +135,56 @@ export async function authenticateUser({ email }) {
   if (!refreshToken) {
     return { message: "User is not signed in!" };
   }
-
+  console.log(refreshToken.value)
   try {
     let result = await contract.submitTransaction(
       "authenticateUser",
       email,
-      refreshToken
+      refreshToken.value
     );
 
     let response = JSON.parse(result.toString());
-
+    setCookies({ name: "accessToken", value: response.accessToken })
 
     return response;
   } catch (e) {
     console.log("Error at authenticateUser ", e);
   }
+}
+
+export async function logout() {
+  let wallet = await buildWallet(Wallets, walletPath);
+  const gateway = new Gateway();
+  await gateway.connect(ccp, {
+    wallet,
+    identity: org1UserId,
+    discovery: { enabled: true, asLocalhost: true }, // using asLocalhost as this gateway is using a fabric network deployed locally
+  });
+  const network = await gateway.getNetwork(channelName);
+  const contract = network.getContract(chaincodeName);
+
+  const refreshToken = cookies().get("refreshToken");
+  if (!refreshToken) {
+    return { message: "User is not signed in!" };
+  }
+  let user = jwt.decode(refreshToken.value);
+  console.log(user)
+
+  let email = user.email;
+  deleteCookies({ name: "refreshToken" })
+  deleteCookies({ name: "userData" })
+  deleteCookies({ name: "accessToken" })
+  try {
+
+    let result = await contract.submitTransaction(
+      "logoutUser",
+      email,
+      refreshToken.value
+    );
+    let response = JSON.parse(result.toString());
+    return response;
+  } catch (e) {
+    console.log("Error at logoutUser ", e);
+  }
+
 }

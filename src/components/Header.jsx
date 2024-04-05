@@ -3,13 +3,17 @@ import { Button, buttonVariants } from "./ui/button";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import MaxWidthWrapper from "./MaxWidthWrapper";
-import { myButtonVariants } from "./ui/MyButton";
+import MyButton, { myButtonVariants } from "./ui/MyButton";
 import { getCooKies } from "@/actions/cookiesManger";
 import { User2 } from "lucide-react";
-
+import jwt from 'jsonwebtoken'
+import { logout } from "@/actions/Authenticate";
 export default async function Header() {
   let refreshToken = await getCooKies({name:"refreshToken"});
- 
+  if(refreshToken ){
+    var userData = jwt.decode(refreshToken)
+    console.log(userData)
+  }
   return (
     <MaxWidthWrapper
       className={
@@ -39,7 +43,10 @@ export default async function Header() {
         >
           Login
         </Link>}
-        {refreshToken && <User2/>}
+        {refreshToken && userData&&  <User2/> + <> {userData.firstName }</>   }
+        {refreshToken && <form action={logout}>
+          <MyButton type="submit" >Logout</MyButton>
+        </form>}
       </div>
     </MaxWidthWrapper>
   );

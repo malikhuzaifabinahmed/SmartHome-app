@@ -46,12 +46,12 @@ export default function AddDevice() {
             }}
           >
             <SelectTrigger className="w-full">
-              <SelectValue placeholder="Theme" />
+              <SelectValue placeholder="Device A" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="dadf">Light</SelectItem>
-              <SelectItem value="dark">Dark</SelectItem>
-              <SelectItem value="system">System</SelectItem>
+              <SelectItem value="dadf">Device A</SelectItem>
+              <SelectItem value="dark">Device B</SelectItem>
+              <SelectItem value="system">Device C</SelectItem>
             </SelectContent>
           </Select>
         </DialogDescription>

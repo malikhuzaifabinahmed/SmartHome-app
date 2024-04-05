@@ -1,35 +1,25 @@
 
-"use server"
 import { getCooKies } from "@/actions/cookiesManger";
-import { authenticateUser } from "@/actions/serverAuthenticatel";
 
-export default async function layout({ children }) {
+import { redirect } from "next/navigation";
+import jwt from "jsonwebtoken"
+import { authenticateUser } from "@/actions/Authenticate";
+import { cookies } from "next/headers";
+import { NextRequest } from "next/server";
+import AccessManager from "@/components/AccessManger";
+export default async function layout({ request, children }) {
     let refreshToken = await getCooKies({ name: "refreshToken" });
-    if (refreshToken) {
-        let accessToken = await getCooKies({ name: "accessToken" });
-        if (!accessToken) {
-            let userData = await getCooKies({ name: "userData" });
-            if (!userData) {
-                //get user data using refresh token
-
-            }
-            else {
-                console.log(userData.value)
-                let jsonUserData =  await JSON.parse(userData.value);
-                console.log(jsonUserData)
-                let response = await authenticateUser({ email: jsonUserData.email });
-                console.log("response",response)
-                // setCookies({name:"accessToken", value:response.accessToken});
-
-            }
-
-
-        }
+    if (refreshToken && refreshToken.value != '') {
+       
         
 
         return <>
+        <AccessManager/>
             {children}</>
 
+    }
+    else{
+        redirect('/login')
     }
 
 }

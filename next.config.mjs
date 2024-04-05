@@ -1,5 +1,7 @@
 /** @type {import('next').NextConfig} */
-const nextConfig = {
+const nextConfig = 
+{
+  serverRuntimeConfig: 'node',
     experimental: {
       
         serverComponentsExternalPackages: ["fabric-ca-client" ,"fabric-network"],
