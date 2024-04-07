@@ -2,7 +2,6 @@ import { getCooKies, setCookies } from "@/actions/cookiesManger";
 
 export default async function Home() {
   try {
-   
   } catch (error) {
     console.log(error)
   }

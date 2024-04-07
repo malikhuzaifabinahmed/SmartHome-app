@@ -3,8 +3,11 @@ import MyButton from "@/components/ui/MyButton";
 import { Button } from "@/components/ui/button";
 
 import AddDevice from "@/components/AddDevice";
+import { getCooKies } from "@/actions/cookiesManger";
 
 export default async function Page() {
+  console. log('some',await getCooKies({name:'some'}))
+
   return (
     <div className="pt-40  ">
       <MaxWidthWrapper>
