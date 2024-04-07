@@ -16,7 +16,7 @@ export default function AccessManager(){
                 //get user data using refresh token
 
             }
-            else {
+          
                
 
 
@@ -25,7 +25,7 @@ export default function AccessManager(){
                let response = await authenticateUser({ email: jsonUserData.email });
                 await setCookies({name:"accessToken", value:response.accessToken});
 
-            }
+            
         
 
         }

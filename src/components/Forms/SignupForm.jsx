@@ -10,8 +10,11 @@ import { Formik, useFormik } from "formik";
 import { toast } from "sonner";
 import { register } from "@/actions/Authenticate";
 import { setCookies } from "@/actions/cookiesManger";
+import { useRouter } from "next/navigation";
 
 export default function SignupForm() {
+  const router = useRouter();
+
   const [isLoading, setIsloading] = useState(false);
   const initialValues = {
     first_name: "",
@@ -48,6 +51,7 @@ export default function SignupForm() {
 
         localStorage.setItem("refreshToken", response.refreshToken);
         toast("Successful Sign up.");
+        router.push('/dashboard');
         setIsloading(false);
       } catch (error) {
         toast("Something went wrong!");
