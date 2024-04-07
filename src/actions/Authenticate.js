@@ -3,7 +3,7 @@
 import { cookies } from "next/headers";
 
 __dirname = "/home/malik/hlf/fabric-samples/test-network/a";
-import jwt from "jsonwebtoken"
+import jwt from "jsonwebtoken";
 import { deleteCookies, setCookies } from "./cookiesManger.js";
 const { Gateway, Wallets } = require("fabric-network");
 const FabricCAServices = require("fabric-ca-client");
@@ -19,7 +19,7 @@ const {
 } = require("../../../hlf/fabric-samples/test-application/javascript/AppUtil.js");
 
 const channelName = process.env.CHANNEL_NAME || "identitymangement";
-const chaincodeName = process.env.CHAINCODE_NAME || "identity2";
+const chaincodeName = process.env.CHAINCODE_NAME || "identity";
 console.log("chain code name given");
 const mspOrg1 = "Org1MSP";
 const walletPath = path.join(
@@ -108,12 +108,15 @@ export async function loginUser({ email, password }) {
     cookies().set("refreshToken", response.refreshToken, {
       maxAge: oneDay * 7,
     });
-    cookies().set("userData", JSON.stringify({
-      email: response.email,
-      role: response.role,
-      firstName: response.firstName,
-      lastName: response.lastName,
-    }));
+    cookies().set(
+      "userData",
+      JSON.stringify({
+        email: response.email,
+        role: response.role,
+        firstName: response.firstName,
+        lastName: response.lastName,
+      })
+    );
 
     return response;
   } catch (e) {
@@ -135,7 +138,7 @@ export async function authenticateUser({ email }) {
   if (!refreshToken) {
     return { message: "User is not signed in!" };
   }
-  console.log(refreshToken.value)
+  console.log(refreshToken.value);
   try {
     let result = await contract.submitTransaction(
       "authenticateUser",
@@ -144,7 +147,7 @@ export async function authenticateUser({ email }) {
     );
 
     let response = JSON.parse(result.toString());
-    setCookies({ name: "accessToken", value: response.accessToken })
+    setCookies({ name: "accessToken", value: response.accessToken });
 
     return response;
   } catch (e) {
@@ -168,14 +171,13 @@ export async function logout() {
     return { message: "User is not signed in!" };
   }
   let user = jwt.decode(refreshToken.value);
-  console.log(user)
+  console.log(user);
 
   let email = user.email;
-  deleteCookies({ name: "refreshToken" })
-  deleteCookies({ name: "userData" })
-  deleteCookies({ name: "accessToken" })
+  deleteCookies({ name: "refreshToken" });
+  deleteCookies({ name: "userData" });
+  deleteCookies({ name: "accessToken" });
   try {
-
     let result = await contract.submitTransaction(
       "logoutUser",
       email,
@@ -186,5 +188,4 @@ export async function logout() {
   } catch (e) {
     console.log("Error at logoutUser ", e);
   }
-
 }
