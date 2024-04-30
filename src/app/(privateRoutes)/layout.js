@@ -9,16 +9,20 @@ import { NextRequest } from "next/server";
 import AccessManager from "@/components/AccessManger";
 export default async function layout({ request, children }) {
     let refreshToken = await getCooKies({ name: "refreshToken" });
+    let accessToken = await getCooKies({ name: 'accessToken' })
     if (refreshToken && refreshToken.value != '') {
-       
-        
+        if (!accessToken || accessToken?.value === '') {
+            console.log('no access value')
+            return <AccessManager />
+
+        }
 
         return <>
-        <AccessManager/>
+            <AccessManager />
             {children}</>
 
     }
-    else{
+    else {
         redirect('/login')
     }
 

@@ -4,7 +4,10 @@ import { cookies } from "next/headers";
 
 __dirname = "/home/malik/hlf/fabric-samples/test-network/a";
 import jwt from "jsonwebtoken";
-import { deleteCookies, setCookies } from "./cookiesManger.js";
+import { deleteCookies, getCooKies, setCookies } from "./cookiesManger.js";
+import { redirect } from "next/navigation.js";
+import { randomUUID } from "crypto";
+import { revalidatePath } from "next/cache.js";
 const { Gateway, Wallets } = require("fabric-network");
 const FabricCAServices = require("fabric-ca-client");
 const path = require("path");
@@ -26,7 +29,7 @@ const walletPath = path.join(
   "/home/malik/SmartHome-app/src/actions/",
   "wallet"
 );
-const org1UserId = "javascriptAppUser";
+const org1UserId = "javascriptAppUser1";
 
 const ccp = buildCCPOrg1();
 console.log("buid cc po org1");
@@ -51,7 +54,8 @@ export default async function createInitialWallet() {
   });
 }
 
-export async function register({ firstName, lastName, email, password, role }) {
+
+export async function register({ firstName, lastName, email, password, role, setCokkies = true }) {
   let wallet = await buildWallet(Wallets, walletPath);
   const gateway = new Gateway();
   await gateway.connect(ccp, {
@@ -76,15 +80,16 @@ export async function register({ firstName, lastName, email, password, role }) {
     );
     const oneDay = 24 * 60 * 60 * 1000;
     let response = JSON.parse(result.toString());
-    cookies().set("refreshToken", response.refreshToken, {
-      maxAge: oneDay * 7,
-    });
+    {
+      setCokkies && cookies().set("refreshToken", response.refreshToken, {
+        maxAge: oneDay * 7,
+      });
+    }
     return response;
   } catch (e) {
     console.log("Error at  register", e);
   }
 }
-
 export async function loginUser({ email, password }) {
   let wallet = await buildWallet(Wallets, walletPath);
   const gateway = new Gateway();
@@ -105,18 +110,20 @@ export async function loginUser({ email, password }) {
     );
     let response = JSON.parse(result.toString());
     const oneDay = 24 * 60 * 60 * 1000;
-    cookies().set("refreshToken", response.refreshToken, {
-      maxAge: oneDay * 7,
-    });
-    cookies().set(
-      "userData",
-      JSON.stringify({
-        email: response.email,
-        role: response.role,
-        firstName: response.firstName,
-        lastName: response.lastName,
-      })
-    );
+    if (response.isOk) {
+      cookies().set("refreshToken", response.refreshToken, {
+        maxAge: oneDay * 7,
+      });
+      cookies().set(
+        "userData",
+        JSON.stringify({
+          email: response.email,
+          role: response.role,
+          firstName: response.firstName,
+          lastName: response.lastName,
+        })
+      );
+    }
 
     return response;
   } catch (e) {
@@ -187,5 +194,500 @@ export async function logout() {
     return response;
   } catch (e) {
     console.log("Error at logoutUser ", e);
+  }
+}
+
+export async function createADevice({ deviceName, properties }) {
+  let accessToken = await getCooKies({ name: "accessToken" });
+  if (!accessToken) {
+    throw new Error("No access token found");
+  }
+  let wallet = await buildWallet(Wallets, walletPath);
+  const gateway = new Gateway();
+  await gateway.connect(ccp, {
+    wallet,
+    identity: org1UserId,
+    discovery: { enabled: true, asLocalhost: true }, // using asLocalhost as this gateway is using a fabric network deployed locally
+  });
+  const network = await gateway.getNetwork(channelName);
+  const contract = network.getContract(chaincodeName);
+  console.log(deviceName,
+    properties,
+    accessToken)
+  try {
+    let result = await contract.submitTransaction(
+      "createDevice",
+      deviceName,
+      JSON.stringify(properties),
+      accessToken.value,
+      randomUUID()
+    );
+
+    let response = JSON.parse(result.toString());
+    console.log(response)
+    console.log(result.toString())
+    return response;
+  } catch (e) {
+    console.log("Error at  createADevice ", e.errors[0].endorsements[0].connection.options);
+    // console.log(e.responses[0].payload.toString())
+    // console.log(e.responses[1].payload.toString())
+    // console.log(e.responses[1].response.payload.toString())
+
+
+  }
+}
+export async function updateDevice({ deviceId, deviceName, properties }) {
+  let accessToken = await getCooKies({ name: "accessToken" });
+  if (!accessToken) {
+    throw new Error("No access token found");
+  }
+  let wallet = await buildWallet(Wallets, walletPath);
+  const gateway = new Gateway();
+  await gateway.connect(ccp, {
+    wallet,
+    identity: org1UserId,
+    discovery: { enabled: true, asLocalhost: true }, // using asLocalhost as this gateway is using a fabric network deployed locally
+  });
+  const network = await gateway.getNetwork(channelName);
+  const contract = network.getContract(chaincodeName);
+  console.log(deviceName,
+    properties,
+    accessToken)
+  try {
+    let result = await contract.submitTransaction(
+      "updateDevice",
+      deviceName,
+      JSON.stringify(properties),
+      accessToken.value,
+      deviceId
+    );
+
+    let response = JSON.parse(result.toString());
+    console.log(response)
+    console.log(result.toString())
+    return response;
+  } catch (e) {
+    console.log("Error at  updateDevice ", e);
+    // console.log(e.responses[0].payload.toString())
+    // console.log(e.responses[1].payload.toString())
+    // console.log(e.responses[1].response.payload.toString())
+
+
+  }
+}
+
+export async function getAllDevicesList() {
+  let accessToken = await getCooKies({ name: "accessToken" });
+  if (!accessToken) {
+    throw new Error("No access token found");
+  }
+  let wallet = await buildWallet(Wallets, walletPath);
+  const gateway = new Gateway();
+  await gateway.connect(ccp, {
+    wallet,
+    identity: org1UserId,
+    discovery: { enabled: true, asLocalhost: true }, // using asLocalhost as this gateway is using a fabric network deployed locally
+  });
+  const network = await gateway.getNetwork(channelName);
+  const contract = network.getContract(chaincodeName);
+  console.log(
+    accessToken)
+  try {
+    let result = await contract.submitTransaction(
+      "getAllDevicesList",
+
+      accessToken.value
+    );
+
+    let response = JSON.parse(result.toString());
+    console.log(result)
+    console.log(result.toString())
+    return response;
+  } catch (e) {
+    console.log("Error at  createADevice ", e);// console.log(e.responses[1].payload.toString())
+    // console.log(e.responses[1].response.payload.toString())
+
+
+  }
+}
+
+export async function createaHome({ homeName, properties, ownerEmail }) {
+  let accessToken = await getCooKies({ name: "accessToken" });
+  if (!accessToken) {
+    throw new Error("No access token found");
+  }
+  let wallet = await buildWallet(Wallets, walletPath);
+  const gateway = new Gateway();
+  await gateway.connect(ccp, {
+    wallet,
+    identity: org1UserId,
+    discovery: { enabled: true, asLocalhost: true }, // using asLocalhost as this gateway is using a fabric network deployed locally
+  });
+  const network = await gateway.getNetwork(channelName);
+  const contract = network.getContract(chaincodeName);
+  console.log(homeName,
+    properties,
+    accessToken, ownerEmail)
+  try {
+    let result = await contract.submitTransaction(
+      "createNewHome",
+      homeName,
+      JSON.stringify(properties),
+      accessToken.value,
+      ownerEmail,
+      randomUUID()
+    );
+
+    let response = JSON.parse(result.toString());
+    console.log(response)
+    console.log(result.toString())
+    return response;
+  } catch (e) {
+    console.log("Error at  createaHome ", e);
+    // console.log(e.responses[0].payload.toString())
+    // console.log(e.responses[1].payload.toString())
+    // console.log(e.responses[1].response.payload.toString())
+
+
+  }
+}
+
+export async function getAllHomeList() {
+  let accessToken = await getCooKies({ name: "accessToken" });
+  if (!accessToken) {
+    throw new Error("No access token found");
+  }
+  let wallet = await buildWallet(Wallets, walletPath);
+  const gateway = new Gateway();
+  await gateway.connect(ccp, {
+    wallet,
+    identity: org1UserId,
+    discovery: { enabled: true, asLocalhost: true }, // using asLocalhost as this gateway is using a fabric network deployed locally
+  });
+  const network = await gateway.getNetwork(channelName);
+  const contract = network.getContract(chaincodeName);
+  console.log(
+    accessToken)
+  try {
+    let result = await contract.submitTransaction(
+      "getAllHomeList",
+
+      accessToken.value
+    );
+
+    let response = JSON.parse(result.toString());
+    console.log(result)
+    console.log(result.toString())
+    return response;
+  } catch (e) {
+    console.log("Error at  createADevice ", e);// console.log(e.responses[1].payload.toString())
+    // console.log(e.responses[1].response.payload.toString())
+
+
+  }
+}
+export async function getUserData({ email }) {
+  let accessToken = await getCooKies({ name: "accessToken" });
+  if (!accessToken) {
+    throw new Error("No access token found");
+  }
+  console.log('working')
+
+  const decoded = jwt.decode(accessToken.value);
+  decoded.email
+  let wallet = await buildWallet(Wallets, walletPath);
+  const gateway = new Gateway();
+  await gateway.connect(ccp, {
+    wallet,
+    identity: org1UserId,
+    discovery: { enabled: true, asLocalhost: true }, // using asLocalhost as this gateway is using a fabric network deployed locally
+  });
+  const network = await gateway.getNetwork(channelName);
+  const contract = network.getContract(chaincodeName);
+
+
+  try {
+
+    let result;
+    if (email) {
+      result = await contract.submitTransaction(
+        "getUserData",
+        email,
+        accessToken.value
+      )
+    } else {
+      result = await contract.submitTransaction(
+        "getUserData",
+        decoded.email,
+        accessToken.value
+      )
+    }
+
+    let response = JSON.parse(result.toString());
+    console.log(result)
+    console.log(result.toString())
+    return response;
+  } catch (e) {
+    console.log("Error at  getUserData ", e);
+
+
+  }
+}
+
+
+
+export async function getAllHomeData({ homeId }) {
+  let accessToken = await getCooKies({ name: "accessToken" });
+  if (!accessToken) {
+    throw new Error("No access token found");
+  }
+  let wallet = await buildWallet(Wallets, walletPath);
+  const gateway = new Gateway();
+  await gateway.connect(ccp, {
+    wallet,
+    identity: org1UserId,
+    discovery: { enabled: true, asLocalhost: true }, // using asLocalhost as this gateway is using a fabric network deployed locally
+  });
+  const network = await gateway.getNetwork(channelName);
+  const contract = network.getContract(chaincodeName);
+  console.log(
+    accessToken)
+  try {
+    let result = await contract.submitTransaction(
+      "getHomeData",
+      homeId,
+      accessToken.value
+    );
+
+    let response = JSON.parse(result.toString());
+    console.log(result)
+    console.log(result.toString())
+    return response;
+  } catch (e) {
+    console.log("Error at  createADevice ", e);// console.log(e.responses[1].payload.toString())
+    // console.log(e.responses[1].response.payload.toString())
+
+
+  }
+}
+
+export async function assignDeviceToHome({ deviceId, homeId }) {
+  let accessToken = await getCooKies({ name: "accessToken" });
+  if (!accessToken) {
+    throw new Error("No access token found");
+  }
+  let wallet = await buildWallet(Wallets, walletPath);
+  const gateway = new Gateway();
+  await gateway.connect(ccp, {
+    wallet,
+    identity: org1UserId,
+    discovery: { enabled: true, asLocalhost: true },
+  });
+  const network = await gateway.getNetwork(channelName);
+  const contract = network.getContract(chaincodeName);
+  console.log(homeId, deviceId,
+    accessToken)
+  try {
+    let result = await contract.submitTransaction(
+      "assignDeviceToHome",
+      homeId,
+
+      deviceId,
+      accessToken.value,
+
+    );
+
+    let response = JSON.parse(result.toString());
+    console.log(response)
+    console.log(result.toString())
+    revalidatePath('/serviceProvider/homeList/assignDevices')
+    // return response;
+  } catch (e) {
+    console.log("Error at  updateDevice ", e);
+
+
+  }
+}
+export async function getUserHome() {
+  let accessToken = await getCooKies({ name: "accessToken" });
+  if (!accessToken) {
+    throw new Error("No access token found");
+  }
+  let wallet = await buildWallet(Wallets, walletPath);
+  const gateway = new Gateway();
+  await gateway.connect(ccp, {
+    wallet,
+    identity: org1UserId,
+    discovery: { enabled: true, asLocalhost: true }, // using asLocalhost as this gateway is using a fabric network deployed locally
+  });
+  const network = await gateway.getNetwork(channelName);
+  const contract = network.getContract(chaincodeName);
+  console.log(
+    accessToken)
+  try {
+    let result = await contract.submitTransaction(
+      "getUserHome",
+
+      accessToken.value
+    );
+
+    let response = JSON.parse(result.toString());
+    console.log(result)
+    console.log(result.toString())
+    return response;
+  } catch (e) {
+    console.log("Error at  createADevice ", e);// console.log(e.responses[1].payload.toString())
+    // console.log(e.responses[1].response.payload.toString())
+
+
+  }
+}
+
+export async function sendRequest({ deviceId, homeId }) {
+  let accessToken = await getCooKies({ name: "accessToken" });
+  if (!accessToken) {
+    throw new Error("No access token found");
+  }
+  let wallet = await buildWallet(Wallets, walletPath);
+  const gateway = new Gateway();
+  await gateway.connect(ccp, {
+    wallet,
+    identity: org1UserId,
+    discovery: { enabled: true, asLocalhost: true },
+  });
+  const network = await gateway.getNetwork(channelName);
+  const contract = network.getContract(chaincodeName);
+  console.log(" Sending request", homeId, deviceId,
+    accessToken)
+  try {
+    let result = await contract.submitTransaction(
+      "sendRequest",
+      accessToken.value,
+      deviceId,
+
+      homeId,
+
+
+    );
+
+    let response = JSON.parse(result.toString());
+    console.log(response)
+    console.log(result.toString())
+    revalidatePath('/serviceProvider/homeList/assignDevices')
+    // return response;
+  } catch (e) {
+    console.log("Error at  updateDevice ", e);
+
+
+  }
+}
+
+export async function getHomeDevice({ deviceId, homeId }) {
+  let accessToken = await getCooKies({ name: "accessToken" });
+  if (!accessToken) {
+    throw new Error("No access token found");
+  }
+  let wallet = await buildWallet(Wallets, walletPath);
+  const gateway = new Gateway();
+  await gateway.connect(ccp, {
+    wallet,
+    identity: org1UserId,
+    discovery: { enabled: true, asLocalhost: true },
+  });
+  const network = await gateway.getNetwork(channelName);
+  const contract = network.getContract(chaincodeName);
+  console.log(homeId, deviceId,
+    accessToken)
+  try {
+    let result = await contract.submitTransaction(
+      "getHomeDevice",
+      homeId,
+
+      deviceId,
+      accessToken.value,
+
+    );
+
+    let response = JSON.parse(result.toString());
+    console.log(response)
+    console.log(result.toString())
+    revalidatePath('/serviceProvider/homeList/assignDevices')
+    // return response;
+  } catch (e) {
+    console.log("Error at  updateDevice ", e);
+
+
+  }
+}
+export async function updateUser({ firstName, lastName, password, }) {
+  console.log('I am herr')
+  let accessToken = await getCooKies({ name: "accessToken" });
+  if (!accessToken) {
+    throw new Error("No access token found");
+  }
+  let wallet = await buildWallet(Wallets, walletPath);
+  const gateway = new Gateway();
+  await gateway.connect(ccp, {
+    wallet,
+    identity: org1UserId,
+    discovery: { enabled: true, asLocalhost: true }, // using asLocalhost as this gateway is using a fabric network deployed locally
+  });
+
+  const network = await gateway.getNetwork(channelName);
+
+  const contract = network.getContract(chaincodeName);
+
+  try {
+    let result = await contract.submitTransaction(
+      "updateUser",
+      firstName,
+      lastName,
+      password,
+      accessToken.value
+
+    );
+    let response = JSON.parse(result.toString());
+
+    return response;
+  } catch (e) {
+    console.log("Error at  register", e);
+  }
+}
+
+
+export async function assignDevicesToUser({ deviceId, homeId, email }) {
+  let accessToken = await getCooKies({ name: "accessToken" });
+  if (!accessToken) {
+    throw new Error("No access token found");
+  }
+  let wallet = await buildWallet(Wallets, walletPath);
+  const gateway = new Gateway();
+  await gateway.connect(ccp, {
+    wallet,
+    identity: org1UserId,
+    discovery: { enabled: true, asLocalhost: true },
+  });
+  const network = await gateway.getNetwork(channelName);
+  const contract = network.getContract(chaincodeName);
+  console.log(homeId, deviceId,
+    accessToken)
+  try {
+    let result = await contract.submitTransaction(
+      "assignDevicesToUser",
+      homeId,
+      deviceId,
+      email,
+      accessToken.value,
+    );
+
+    let response = JSON.parse(result.toString());
+    console.log(response)
+    console.log(result.toString())
+    revalidatePath('/serviceProvider/homeList/assignDevices')
+    // return response;
+  } catch (e) {
+    console.log("Error at  updateDevice ", e);
+
+
   }
 }

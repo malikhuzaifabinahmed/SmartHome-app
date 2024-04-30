@@ -44,7 +44,7 @@ export default function LoginForm() {
         toast("Successful login");
         router.push('/dashboard');
         setIsloading(false);
-       
+
       } catch (error) {
         toast("Something went wrong!");
         setIsloading(false);

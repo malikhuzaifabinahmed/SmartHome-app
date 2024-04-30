@@ -24,7 +24,7 @@ const chaincodeName = process.env.CHAINCODE_NAME || "identity2";
 console.log("chain code name given")
 const mspOrg1 = "Org1MSP";
 const walletPath = path.join('/home/malik/SmartHome-app/src/app/api/register/', "wallet");
-const org1UserId = "javascriptAppUser";
+const org1UserId = "javascriptAppUser1";
 
 
 const ccp = buildCCPOrg1();

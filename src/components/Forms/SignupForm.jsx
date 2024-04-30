@@ -11,10 +11,19 @@ import { toast } from "sonner";
 import { register } from "@/actions/Authenticate";
 import { setCookies } from "@/actions/cookiesManger";
 import { useRouter } from "next/navigation";
-
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import { Label } from "../ui/label";
 export default function SignupForm() {
   const router = useRouter();
-
+  let roles = ['normal_user', 'service_requestor'];
   const [isLoading, setIsloading] = useState(false);
   const initialValues = {
     first_name: "",
@@ -22,6 +31,7 @@ export default function SignupForm() {
     email: "",
     password: "",
     password_confirmation: "",
+    role: 'normal_user'
   };
 
   const validationSchema = Yup.object({
@@ -46,7 +56,7 @@ export default function SignupForm() {
           lastName: values.last_name,
           email: values.email,
           password: values.password,
-          role: "user",
+          role: values.role,
         });
 
         localStorage.setItem("refreshToken", response.refreshToken);
@@ -59,6 +69,9 @@ export default function SignupForm() {
       }
     },
   });
+
+
+  console.log(formik.values)
   return (
     <form
       action={formik.handleSubmit}
@@ -114,7 +127,23 @@ export default function SignupForm() {
             }
           />
         </div>
+        <Label >
+          Role
+        </Label>
+        <Select onValueChange={(e) => { formik.setFieldValue("role", e) }}>
+          <SelectTrigger className="">
+            <SelectValue placeholder="Slect Role" />
+          </SelectTrigger>
+          <SelectContent >
+            <SelectItem value="service_requestor">Service Requestor</SelectItem>
+            <SelectItem value="normal_user">Normal User</SelectItem>
+          </SelectContent>
+        </Select>
+
+
         <div className="grid w-full max-w-md items-center gap-1.5">
+
+
           <InputField
             label="Password"
             type="password"
@@ -131,6 +160,8 @@ export default function SignupForm() {
             }
           />
         </div>
+
+
         <div className="grid w-full max-w-md items-center gap-1.5">
           <InputField
             label="Confirm Password"

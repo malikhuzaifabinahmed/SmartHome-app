@@ -28,7 +28,7 @@ export default async function RootLayout({ children }) {
           ` ${fraunces_600.variable} ${fraunces_bold.variable} ${fraunces_semibold.variable} ${rubik.variable} ${fraunces.variable}`
         )}
       >
-        <Header />
+        {/* <Header /> */}
         {children}
         <Toaster />
       </body>

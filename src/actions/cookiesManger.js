@@ -2,9 +2,8 @@
 import { cookies } from 'next/headers'
 
 export async function setCookies({ name, value, ...props }) {
-    "use server"
     console.log({ ...props })
-    cookies().set({
+    await cookies().set({
         name: name,
         value: value,
         httpOnly: true,
@@ -15,7 +14,7 @@ export async function setCookies({ name, value, ...props }) {
 export async function getCooKies({ name
 
 }) {
-    return cookies().get(name);
+    return await cookies().get(name);
 }
 export async function deleteCookies({ name }) {
     cookies().delete(name)
