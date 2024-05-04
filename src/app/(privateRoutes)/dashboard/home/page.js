@@ -17,6 +17,7 @@ import RequestButton from "@/components/RequestAccess";
 import { objectsPresentInAOnly } from "@/lib/utils";
 import { Suspense } from "react";
 import Loading from "@/app/loading";
+import { object } from "yup";
 export default async function Page() {
     return <Suspense fallback={<Loading />}>
         <div className="p-5">
@@ -37,8 +38,7 @@ async function Renderer() {
         response = await getUserHome();
         Homes = await getAllHomeList();
         fullUserData = await getUserData({ email: userData.email });
-        console.log(response);
-        console.log(fullUserData);
+
 
     } catch (error) {
 
@@ -125,20 +125,20 @@ async function Renderer() {
                     </TableRow>
                 </TableHeader>
                 <TableBody>
-                    {myhome.requests.normalUser.map(device => (
+                    {myhome.requests.normalUser.map(normalUser => (
 
 
 
 
                         <TableRow>
-                            <TableCell className="font-medium ">{device.deviceName}</TableCell>
+                            <TableCell className="font-medium ">{normalUser}</TableCell>
 
                             <TableCell className="w-full   overflow-x-scroll ">
 
                                 Normal User
                             </TableCell>
                             <TableCell>
-                                <Link href={``}>
+                                <Link href={`/dashboard/home/assignDevices?homeId=${myhome.homeId}&email=${normalUser}`}>
                                     <MyButton type='submit' variant='icon'> Give Access</MyButton>
                                 </Link>
                             </TableCell>
@@ -155,14 +155,14 @@ async function Renderer() {
 
 
                         <TableRow>
-                            <TableCell className="font-medium ">{reqeustor.email}</TableCell>
+                            <TableCell className="font-medium ">{reqeustor}</TableCell>
 
                             <TableCell className="w-full   overflow-x-scroll ">
 
                                 Service requestor
                             </TableCell>
                             <TableCell>
-                                <Link href={`/dashboard/home/assignDevices?homeId=${myhome.homeId}&email=${reqeustor.email}`}>
+                                <Link href={`/dashboard/home/assignDevices?homeId=${myhome.homeId}&email=${reqeustor}`}>
                                     <MyButton type='submit' variant='icon'> Give Access</MyButton>
                                 </Link>
                             </TableCell>
@@ -178,9 +178,8 @@ async function Renderer() {
     }
 
     //For the role of admin
-    if (response && response.isOk && Object.keys(response.response).length !== 0) {
+    if (response && response.isOk && response.response.admin && response.response.admin.length !== 0) {
         let adminhome = response.response.admin
-        console.log("adminhomde", adminhome)
 
         return <div>{adminhome.map(home => renderHome({ myhome: home }))}</div>
     }
@@ -192,29 +191,24 @@ async function Renderer() {
         let availableHome;
         let requestedHome;
 
-        console.log(fullUserData.user)
         if (fullUserData.user.accessList.normalUser.length !== 0) {
-            availableHome = filteredHome = Homes.homeList.filter(home =>
+            availableHome = Homes.homeList.filter(home =>
 
-                fullUserData.user.accessList.normalUser.some(homeId => home.homeId == homeId)
+                Object.keys(fullUserData.user.accessList.normalUser).some(homeId => home.homeId == homeId)
             )
             availableHome = availableHome[0]
 
 
         }
         if (fullUserData.user.accessList.serviceRequestors.length !== 0) {
-            availableHome = filteredHome = Homes.homeList.filter(home =>
-
-                fullUserData.user.accessList.serviceRequestors.some(homeId => home.homeId == homeId)
-            )
-            availableHome = availableHome[0]
+            availableHome = response.response.serviceRequestors
 
 
 
         }
         if (fullUserData.user.requests.normalUser.length !== 0) {
             requestedHome
-                = filteredHome = Homes.homeList.filter(home =>
+                = Homes.homeList.filter(home =>
 
                     fullUserData.user.requests.normalUser.some(homeId => home.homeId == homeId)
                 )
@@ -223,7 +217,7 @@ async function Renderer() {
 
         }
         if (fullUserData.user.requests.serviceRequestors.length !== 0) {
-            requestedHome = filteredHome = Homes.homeList.filter(home =>
+            requestedHome = Homes.homeList.filter(home =>
 
                 fullUserData.user.requests.serviceRequestors.some(homeId => home.homeId == homeId)
             )
@@ -233,7 +227,14 @@ async function Renderer() {
 
         }
 
+        console.log('Homes', Homes)
+        console.log('response', response.response.serviceRequestors)
+        // console.log("availableHome", availableHome)
 
+        // console.log("requestedHome", requestedHome)
+        // console.log("fittered", filteredHome)
+        // console.log("fullUserData.user.requests.serviceRequestors", fullUserData.user.requests.serviceRequestors)
+        // console.log("fullUserData.user.requests.normalUser", fullUserData.user.requests.normalUser)
 
         if (!availableHome && !requestedHome) {
             return <div>
@@ -254,7 +255,7 @@ async function Renderer() {
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {filteredHome.map(device => (
+                            {Homes.homeList.map(device => (
 
 
 
@@ -307,9 +308,12 @@ async function Renderer() {
             </div>
         }
         else
-            if (availableHome) {
-                return renderHome(availableHome)
+            if (availableHome.length !== 0) {
+                console.log(availableHome)
+                return <>{availableHome.map(home => renderHome({ myhome: home }))} </>
+
             }
+
         if (requestedHome) {
             return <div>
 

@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "deve": "next dev",
     "dev": "sudo rm -r src/actions/wallet && node src/WalletCreator.js && next dev",
     "build": "next build",
     "start": "next start",

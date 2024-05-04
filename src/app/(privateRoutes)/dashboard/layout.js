@@ -28,7 +28,7 @@ export default function Layout({ children }) {
           Home
         </Link>
         <Link className='text-white  py-2 px-3 text-center hover:bg-accent rounded-md hover:text-accent-foreground ' href='/dashboard/profile'>
-          Eidit profile
+          Edit profile
         </Link>
 
       </div>

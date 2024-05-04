@@ -40,13 +40,22 @@ export default function LoginForm() {
           email: values.email,
           password: values.password,
         });
-        localStorage.setItem("refreshToken", response.refreshToken);
-        toast("Successful login");
-        router.push('/dashboard');
-        setIsloading(false);
+
+        if (response.isOk) {
+          localStorage.setItem("refreshToken", response.refreshToken);
+          toast("Successful login");
+          router.push('/dashboard');
+          setIsloading(false);
+        }
+        else {
+          throw response.message
+        }
+
+
+
 
       } catch (error) {
-        toast("Something went wrong!");
+        toast(error);
         setIsloading(false);
       }
       console.log(values);

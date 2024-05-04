@@ -339,6 +339,7 @@ export async function createaHome({ homeName, properties, ownerEmail }) {
     );
 
     let response = JSON.parse(result.toString());
+    revalidatePath('/serviceProvider/homeList')
     console.log(response)
     console.log(result.toString())
     return response;
@@ -410,6 +411,7 @@ export async function getUserData({ email }) {
 
     let result;
     if (email) {
+      console.log("I am using given email : ", email)
       result = await contract.submitTransaction(
         "getUserData",
         email,
@@ -656,6 +658,10 @@ export async function updateUser({ firstName, lastName, password, }) {
 
 
 export async function assignDevicesToUser({ deviceId, homeId, email }) {
+
+  console.log('deviceId', deviceId, 'homeId', homeId, 'email', email)
+
+
   let accessToken = await getCooKies({ name: "accessToken" });
   if (!accessToken) {
     throw new Error("No access token found");

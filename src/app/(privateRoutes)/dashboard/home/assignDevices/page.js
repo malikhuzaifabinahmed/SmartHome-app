@@ -1,5 +1,5 @@
 import { assignDeviceToHome, getAllDevicesList, getAllHomeData, getUserData, getUserHome, updateDevice } from "@/actions/Authenticate";
-import AssignDeviceToHome from "@/components/AssignDeviceToHome";
+import AssignDeviceToUser from "@/components/AssignDeviceToUser";
 import AssignButton from "@/components/AsssignButton";
 import MyButton from "@/components/ui/MyButton";
 import {
@@ -17,58 +17,67 @@ export default async function Page({ searchParams }) {
     let homeId = searchParams.homeId;
     let email = searchParams.email
     console.log(email, homeId)
-    let response;
-    let homeResponse;
+    let userHomes;
+    let requestorData;
     try {
-        response = await getUserData({ email })
-        homeResponse = await getUserHome();
-        console.log(homeResponse)
-        console.log(response)
+        requestorData = await getUserData({ email })
+        userHomes = await getUserHome();
+
     } catch (error) {
         console.log(error)
     }
 
 
-    if (homeResponse.isOk) {
-        let currentHome;
-        let user = response.user;
+    if (userHomes.isOk) {
+        let currentHome = userHomes.response.admin.filter(home => home.homeId == homeId)
+        currentHome = currentHome[0];
+        let user = requestorData.user;
 
-        let fileteredList = [];
+        let fileteredDeviceList = [];
         if (user.role == "normal_user") {
 
-            currentHome = homeResponse.response.admin.filter(home => home.homeId == homeId)
-            currentHome = currentHome[0];
-            console.log(currentHome)
+
 
             if (user.accessList.normalUser[`${homeId}`]) {
-                fileteredList = currentHome.devices.filter(device =>
+                fileteredDeviceList = currentHome.devices.filter(device =>
                     user.accessList.normalUser[`${homeId}`].some(deviceId => device.deviceId !== deviceId)
 
                 )
 
+                console.log("i rans")
 
-
+            } else {
+                fileteredDeviceList = currentHome.devices
             }
         }
         if (user.role == "service_requestor") {
-
-            currentHome = homeResponse.response.admin.filter(home => home.homeId == homeId)
-            currentHome = currentHome[0];
-            console.log(currentHome)
+            console.log('currentHome.devices', currentHome.devices)
 
             if (user.accessList.serviceRequestors[`${homeId}`]) {
-                fileteredList = currentHome.devices.filter(device =>
-                    user.accessList.serviceRequestors[`${homeId}`].some(deviceId => device.deviceId !== deviceId)
+                fileteredDeviceList = currentHome.devices.filter(device => {
+
+                    return !(user.accessList.serviceRequestors[`${homeId}`].some(deviceId => {
+                        console.log('deviceId', deviceId, 'device.deviceId ', device.deviceId)
+                        return (device.deviceId === deviceId)
+                    }))
+                }
 
                 )
 
 
 
             } else {
-                fileteredList = currentHome.devices
+                fileteredDeviceList = currentHome.devices
             }
         }
-        console.log(fileteredList)
+
+
+
+        // console.log('requestorData', requestorData.user.accessList.serviceRequestors)
+        // console.log('userHomes', userHomes)
+        // console.log('currentHome', currentHome)
+
+        // console.log("fileteredDeviceList", fileteredDeviceList)
 
         return <div className=' overflow-hidden'>
             <Table  >
@@ -81,12 +90,12 @@ export default async function Page({ searchParams }) {
                     </TableRow>
                 </TableHeader>
                 <TableBody>
-                    {fileteredList.map(device => (
+                    {fileteredDeviceList.map(device => (
 
 
 
 
-                        <TableRow>
+                        <TableRow key={device.deviceId}>
                             <TableCell className="font-medium ">{device.deviceName}</TableCell>
 
                             <TableCell className="w-full   overflow-x-scroll ">
@@ -115,7 +124,7 @@ export default async function Page({ searchParams }) {
                                 </Table>
                             </TableCell>
                             <TableCell>
-                                <AssignDeviceToHome deviceId={device.deviceId} homeId={homeId} email={user.email} />
+                                <AssignDeviceToUser deviceId={device.deviceId} homeId={homeId} email={user.email} />
                             </TableCell>
                         </TableRow>
 
@@ -125,9 +134,9 @@ export default async function Page({ searchParams }) {
                 </TableBody>
             </Table>
 
-            {/* <div className=" w-full text-center font-fraunces_bold text-xl"> Assigned Devices </div> */}
-            {/* <Table  >
-                <TableCaption>A list of Devices Assigned by the Service Provider</TableCaption>
+            <div className=" w-full text-center font-fraunces_bold text-xl"> Assigned Devices </div>
+            <Table  >
+                <TableCaption>A list of Devices Assigned to user by home Admin </TableCaption>
                 <TableHeader>
                     <TableRow >
                         <TableHead className="w-[100px]  whitespace-nowrap">Device Name</TableHead>
@@ -136,45 +145,63 @@ export default async function Page({ searchParams }) {
                     </TableRow>
                 </TableHeader>
                 <TableBody>
-                    {user.role == "service_requestor" ? object.keys(user.accessList.serviceRequestors).map(device => (
+                    {user.role == "service_requestor" ? Object.keys(user.accessList.serviceRequestors).map(homeId => {
+                        let devices = currentHome.devices.filter(device =>
+
+
+
+                            user.accessList.serviceRequestors[homeId].some(deviceId => {
+
+                                console.log('deviceId', deviceId)
+                                return device.deviceId === deviceId
+                            })
+                        )
 
 
 
 
-                        <TableRow>
-                            <TableCell className="font-medium ">{device.deviceName}</TableCell>
-
-                            <TableCell className="w-full   overflow-x-scroll ">
-
-                                <Table className="w-fit whitespace-nowrap" >
-                                    <TableHeader>
-                                        <TableRow>
-                                            {Object.keys(device.properties).map(property => (
-
-                                                <TableHead > {property} </TableHead>
+                        return (
 
 
-                                            ))}
-                                        </TableRow>
-                                    </TableHeader>
-                                    <TableBody>
-                                        <TableRow>
-                                            {Object.keys(device.properties).map(property => (
 
-                                                <TableCell > {device.properties[property]} </TableCell>
+                            <>{
+                                devices.map(device => <TableRow>
+                                    <TableCell className="font-medium ">{device.deviceName}</TableCell>
 
+                                    <TableCell className="w-full   overflow-x-scroll ">
 
-                                            ))}
-                                        </TableRow>
-                                    </TableBody>
-                                </Table>
-                            </TableCell>
+                                        <Table className="w-fit whitespace-nowrap" >
+                                            <TableHeader>
+                                                <TableRow>
+                                                    {Object.keys(device.properties).map(property => (
 
-                        </TableRow>
+                                                        <TableHead > {property} </TableHead>
 
 
-                    )) :
-                        user.role == "normal_user" ? object.keys(user.accessList.serviceRequestors).map(houseId => (
+                                                    ))}
+                                                </TableRow>
+                                            </TableHeader>
+                                            <TableBody>
+                                                <TableRow>
+                                                    {Object.keys(device.properties).map(property => (
+
+                                                        <TableCell > {device.properties[property]} </TableCell>
+
+
+                                                    ))}
+                                                </TableRow>
+                                            </TableBody>
+                                        </Table>
+                                    </TableCell>
+
+                                </TableRow>)
+                            }</>
+
+
+
+                        )
+                    }) :
+                        user.role == "normal_user" ? Object.keys(user.accessList.serviceRequestors).map(houseId => (
 
 
 
@@ -215,7 +242,7 @@ export default async function Page({ searchParams }) {
                     }
 
                 </TableBody>
-            </Table> */}
+            </Table>
 
 
         </div>

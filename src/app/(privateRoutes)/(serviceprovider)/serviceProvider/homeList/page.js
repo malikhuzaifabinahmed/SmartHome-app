@@ -78,7 +78,7 @@ export default async function Page() {
                             </TableCell>
                             <TableCell>
                                 <Link href={`/serviceProvider/homeList/assignDevices?homeId=${device.homeId}`}>
-                                    <MyButton type='submit' variant='icon'> Assign divices</MyButton>
+                                    <MyButton type='submit' variant='icon'> Assign devices</MyButton>
                                 </Link>
 
                             </TableCell>

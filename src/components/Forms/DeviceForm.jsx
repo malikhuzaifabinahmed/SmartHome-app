@@ -50,6 +50,7 @@ export default function DeviceForm({ device, home }) {
         })
         console.log(response)
         toast('Device created succesfuly')
+        router.push('/serviceProvider/deviceList')
         revalidatePath('/serviceProvider/deviceList')
         setIsLoading(false);
       } catch (e) {

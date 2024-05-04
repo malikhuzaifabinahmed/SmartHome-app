@@ -1,4 +1,4 @@
-import { getCooKies } from '@/actions/cookiesManger';
+import { deleteCookies, getCooKies } from '@/actions/cookiesManger';
 import jwt from "jsonwebtoken"
 import { headers } from 'next/headers';
 import { NextResponse } from 'next/server';
@@ -11,31 +11,50 @@ export async function middleware(request) {
 
 
   if (request.cookies.has("refreshToken")) {
-
+    console.log('refresh cookies found')
     let refreshToken = request.cookies.get("refreshToken")
-    let userData = jwt.decode(refreshToken.value);
-    if (userData.role === 'service_provider') {
-      console.log("Inside access")
-      if (path == '/serviceProvider') {
-        return NextResponse.next()
-      }
-      else {
-        return NextResponse.redirect(new URL('/serviceProvider', request.url))
 
-      }
-    } else {
-      console.log("Inside no acces")
-      if (path == '/dashboard') {
-        return NextResponse.next()
-      }
-      else {
-        return NextResponse.redirect(new URL('/dashboard', request.url))
+    if (refreshToken && refreshToken.value !== '') {
+      let userData = jwt.decode(refreshToken.value);
+
+      console.log('refresh cookies found but courupted')
+      if (userData.role === 'service_provider') {
+        console.log("Inside access")
+        if (path == '/serviceProvider') {
+          return NextResponse.next()
+        }
+        else {
+          return NextResponse.redirect(new URL('/serviceProvider', request.url))
+
+        }
+      } else {
+        console.log("inside acces")
+        if (path == '/dashboard') {
+          return NextResponse.next()
+        }
+        else {
+          console.log("inside acces")
+
+          return NextResponse.redirect(new URL('/dashboard', request.url))
+        }
       }
     }
+    else {
+      console.log('Else refresh cookies found but courupted')
+      const response = NextResponse.next();
+      // await request.cookies.delete("refreshToken");
+      // Delete specific cookies
+      response.cookies.cookies.delete("refreshToken");
+      return response
+    }
+
+
 
   }
   else {
+    console.log('No refresh cookies found')
     return NextResponse.redirect(new URL('/login', request.url))
+
   }
 
 

@@ -2,7 +2,12 @@
 import { assignDevicesToUser } from "@/actions/Authenticate";
 import MyButton from "./ui/MyButton";
 
-export default function AssignDeviceToHome({ homeId, deviceId, email }) {
+export default function AssignDeviceToUser({ homeId, deviceId, email }) {
+
+    // params are correct here
+    console.log('deviceId', deviceId, 'homeId', homeId, 'email', email)
+
+
     return <MyButton onClick={
         async () => {
             await assignDevicesToUser({ email, homeId, deviceId })

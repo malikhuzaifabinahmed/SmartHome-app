@@ -57,6 +57,8 @@ export default function HomeForm({ user }) {
           })
           console.log(response)
           toast('Home created succesfuly')
+          router.push("/serviceProvider/homeList")
+
           revalidatePath('/serviceProvider/homeList')
         }
         else {
