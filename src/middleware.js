@@ -41,7 +41,7 @@ export async function middleware(request) {
       const response = NextResponse.next();
       // await request.cookies.delete("refreshToken");
       // Delete specific cookies
-      response.cookies.cookies.delete("refreshToken");
+      response.cookies.delete("refreshToken");
       return response
     }
 
