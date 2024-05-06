@@ -1,12 +1,12 @@
 "use server";
 
 import { cookies } from "next/headers";
-
-__dirname = "/home/malik/hlf/fabric-samples/test-network/a";
+__dirname = `/home/${os.userInfo().username}/hlf/fabric-samples/test-network/a`;
 import jwt from "jsonwebtoken";
 import { deleteCookies, getCooKies, setCookies } from "./cookiesManger.js";
 import { redirect } from "next/navigation.js";
 import { randomUUID } from "crypto";
+import * as os from "os";
 import { revalidatePath } from "next/cache.js";
 const { Gateway, Wallets } = require("fabric-network");
 const FabricCAServices = require("fabric-ca-client");
@@ -26,7 +26,7 @@ const chaincodeName = process.env.CHAINCODE_NAME || "identity";
 console.log("chain code name given");
 const mspOrg1 = "Org1MSP";
 const walletPath = path.join(
-  "/home/malik/SmartHome-app/src/actions/",
+  `/home/${os.userInfo().username}/SmartHome/src/actions/`,
   "wallet"
 );
 const org1UserId = "javascriptAppUser1";
@@ -37,7 +37,7 @@ console.log("buid cc po org1");
 const caClient = buildCAClient(FabricCAServices, ccp, "ca.org1.example.com");
 console.log("able to enroll admin");
 
-__dirname = "/home/malik/SmartHome-app/src/actions/";
+__dirname = `/home/${os.userInfo().username}/SmartHome/src/actions/`;
 const oneDay = 24 * 60 * 60 * 1000;
 
 export default async function createInitialWallet() {
@@ -85,9 +85,10 @@ export async function register({ firstName, lastName, email, password, role, set
         maxAge: oneDay * 7,
       });
     }
+    gateway.disconnect()
     return response;
   } catch (e) {
-    console.log("Error at  register", e);
+    console.log("Error at  register", e); gateway.disconnect()
   }
 }
 export async function loginUser({ email, password }) {
@@ -124,10 +125,11 @@ export async function loginUser({ email, password }) {
         })
       );
     }
-
+    gateway.disconnect()
     return response;
   } catch (e) {
     console.log("Error at login ", e);
+    gateway.disconnect()
   }
 }
 export async function authenticateUser({ email }) {
@@ -155,10 +157,11 @@ export async function authenticateUser({ email }) {
 
     let response = JSON.parse(result.toString());
     setCookies({ name: "accessToken", value: response.accessToken });
-
+    gateway.disconnect()
     return response;
   } catch (e) {
     console.log("Error at authenticateUser ", e);
+    gateway.disconnect()
   }
 }
 
@@ -191,9 +194,11 @@ export async function logout() {
       refreshToken.value
     );
     let response = JSON.parse(result.toString());
+    gateway.disconnect()
     return response;
   } catch (e) {
     console.log("Error at logoutUser ", e);
+    gateway.disconnect()
   }
 }
 
@@ -226,13 +231,14 @@ export async function createADevice({ deviceName, properties }) {
     let response = JSON.parse(result.toString());
     console.log(response)
     console.log(result.toString())
+    gateway.disconnect()
     return response;
   } catch (e) {
     console.log("Error at  createADevice ", e.errors[0].endorsements[0].connection.options);
     // console.log(e.responses[0].payload.toString())
     // console.log(e.responses[1].payload.toString())
     // console.log(e.responses[1].response.payload.toString())
-
+    gateway.disconnect()
 
   }
 }
@@ -265,6 +271,7 @@ export async function updateDevice({ deviceId, deviceName, properties }) {
     let response = JSON.parse(result.toString());
     console.log(response)
     console.log(result.toString())
+    gateway.disconnect()
     return response;
   } catch (e) {
     console.log("Error at  updateDevice ", e);
@@ -272,7 +279,7 @@ export async function updateDevice({ deviceId, deviceName, properties }) {
     // console.log(e.responses[1].payload.toString())
     // console.log(e.responses[1].response.payload.toString())
 
-
+    gateway.disconnect()
   }
 }
 
@@ -302,11 +309,12 @@ export async function getAllDevicesList() {
     let response = JSON.parse(result.toString());
     console.log(result)
     console.log(result.toString())
+    gateway.disconnect()
     return response;
   } catch (e) {
     console.log("Error at  createADevice ", e);// console.log(e.responses[1].payload.toString())
     // console.log(e.responses[1].response.payload.toString())
-
+    gateway.disconnect()
 
   }
 }
@@ -342,13 +350,14 @@ export async function createaHome({ homeName, properties, ownerEmail }) {
     revalidatePath('/serviceProvider/homeList')
     console.log(response)
     console.log(result.toString())
+    gateway.disconnect()
     return response;
   } catch (e) {
     console.log("Error at  createaHome ", e);
     // console.log(e.responses[0].payload.toString())
     // console.log(e.responses[1].payload.toString())
     // console.log(e.responses[1].response.payload.toString())
-
+    gateway.disconnect()
 
   }
 }
@@ -379,11 +388,12 @@ export async function getAllHomeList() {
     let response = JSON.parse(result.toString());
     console.log(result)
     console.log(result.toString())
+    gateway.disconnect()
     return response;
   } catch (e) {
     console.log("Error at  createADevice ", e);// console.log(e.responses[1].payload.toString())
     // console.log(e.responses[1].response.payload.toString())
-
+    gateway.disconnect()
 
   }
 }
@@ -428,10 +438,11 @@ export async function getUserData({ email }) {
     let response = JSON.parse(result.toString());
     console.log(result)
     console.log(result.toString())
+    gateway.disconnect()
     return response;
   } catch (e) {
     console.log("Error at  getUserData ", e);
-
+    gateway.disconnect()
 
   }
 }
@@ -464,11 +475,12 @@ export async function getAllHomeData({ homeId }) {
     let response = JSON.parse(result.toString());
     console.log(result)
     console.log(result.toString())
+    gateway.disconnect()
     return response;
   } catch (e) {
     console.log("Error at  createADevice ", e);// console.log(e.responses[1].payload.toString())
     // console.log(e.responses[1].response.payload.toString())
-
+    gateway.disconnect()
 
   }
 }
@@ -503,9 +515,11 @@ export async function assignDeviceToHome({ deviceId, homeId }) {
     console.log(response)
     console.log(result.toString())
     revalidatePath('/serviceProvider/homeList/assignDevices')
+    gateway.disconnect()
     // return response;
   } catch (e) {
     console.log("Error at  updateDevice ", e);
+    gateway.disconnect()
 
 
   }
@@ -536,12 +550,14 @@ export async function getUserHome() {
     let response = JSON.parse(result.toString());
     console.log(result)
     console.log(result.toString())
+    gateway.disconnect()
     return response;
+
   } catch (e) {
     console.log("Error at  createADevice ", e);// console.log(e.responses[1].payload.toString())
     // console.log(e.responses[1].response.payload.toString())
 
-
+    gateway.disconnect()
   }
 }
 
@@ -576,10 +592,11 @@ export async function sendRequest({ deviceId, homeId }) {
     console.log(response)
     console.log(result.toString())
     revalidatePath('/serviceProvider/homeList/assignDevices')
+    gateway.disconnect()
     // return response;
   } catch (e) {
     console.log("Error at  updateDevice ", e);
-
+    gateway.disconnect()
 
   }
 }
@@ -614,10 +631,11 @@ export async function getHomeDevice({ deviceId, homeId }) {
     console.log(response)
     console.log(result.toString())
     revalidatePath('/serviceProvider/homeList/assignDevices')
+    gateway.disconnect()
     // return response;
   } catch (e) {
     console.log("Error at  updateDevice ", e);
-
+    gateway.disconnect()
 
   }
 }
@@ -649,10 +667,11 @@ export async function updateUser({ firstName, lastName, password, }) {
 
     );
     let response = JSON.parse(result.toString());
-
+    gateway.disconnect()
     return response;
   } catch (e) {
     console.log("Error at  register", e);
+    gateway.disconnect()
   }
 }
 
@@ -690,10 +709,11 @@ export async function assignDevicesToUser({ deviceId, homeId, email }) {
     console.log(response)
     console.log(result.toString())
     revalidatePath('/serviceProvider/homeList/assignDevices')
+    gateway.disconnect()
     // return response;
   } catch (e) {
     console.log("Error at  updateDevice ", e);
-
+    gateway.disconnect()
 
   }
 }

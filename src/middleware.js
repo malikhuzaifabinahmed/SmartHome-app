@@ -19,7 +19,6 @@ export async function middleware(request) {
 
       console.log('refresh cookies found but courupted')
       if (userData.role === 'service_provider') {
-        console.log("Inside access")
         if (path == '/serviceProvider') {
           return NextResponse.next()
         }
@@ -28,12 +27,10 @@ export async function middleware(request) {
 
         }
       } else {
-        console.log("inside acces")
         if (path == '/dashboard') {
           return NextResponse.next()
         }
         else {
-          console.log("inside acces")
 
           return NextResponse.redirect(new URL('/dashboard', request.url))
         }

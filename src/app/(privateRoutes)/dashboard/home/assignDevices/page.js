@@ -39,12 +39,15 @@ export default async function Page({ searchParams }) {
 
 
             if (user.accessList.normalUser[`${homeId}`]) {
-                fileteredDeviceList = currentHome.devices.filter(device =>
-                    user.accessList.normalUser[`${homeId}`].some(deviceId => device.deviceId !== deviceId)
+                fileteredDeviceList = currentHome.devices.filter(device => {
+
+                    return !(user.accessList.normalUser[`${homeId}`].some(deviceId => {
+                        console.log('deviceId', deviceId, 'device.deviceId ', device.deviceId)
+                        return (device.deviceId === deviceId)
+                    }))
+                }
 
                 )
-
-                console.log("i rans")
 
             } else {
                 fileteredDeviceList = currentHome.devices
@@ -201,44 +204,63 @@ export default async function Page({ searchParams }) {
 
                         )
                     }) :
-                        user.role == "normal_user" ? Object.keys(user.accessList.serviceRequestors).map(houseId => (
+                        user.role == "normal_user" ? Object.keys(user.accessList.normalUser).map(homeId => {
+
+                            let devices = currentHome.devices.filter(device =>
 
 
 
+                                user.accessList.normalUser[homeId].some(deviceId => {
 
-                            <TableRow>
-                                <TableCell className="font-medium ">{device.deviceName}</TableCell>
+                                    console.log('deviceId', deviceId)
+                                    return device.deviceId === deviceId
+                                })
+                            )
 
-                                <TableCell className="w-full   overflow-x-scroll ">
-
-                                    <Table className="w-fit whitespace-nowrap" >
-                                        <TableHeader>
-                                            <TableRow>
-                                                {Object.keys(device.properties).map(property => (
-
-                                                    <TableHead > {property} </TableHead>
+                            return (
 
 
-                                                ))}
-                                            </TableRow>
-                                        </TableHeader>
-                                        <TableBody>
-                                            <TableRow>
-                                                {Object.keys(device.properties).map(property => (
 
-                                                    <TableCell > {device.properties[property]} </TableCell>
+                                <>{
+                                    devices.map(device => <TableRow>
+                                        <TableCell className="font-medium ">{device.deviceName}</TableCell>
 
+                                        <TableCell className="w-full   overflow-x-scroll ">
 
-                                                ))}
-                                            </TableRow>
-                                        </TableBody>
-                                    </Table>
-                                </TableCell>
+                                            <Table className="w-fit whitespace-nowrap" >
+                                                <TableHeader>
+                                                    <TableRow>
+                                                        {Object.keys(device.properties).map(property => (
 
-                            </TableRow>
+                                                            <TableHead > {property} </TableHead>
 
 
-                        )) : ""
+                                                        ))}
+                                                    </TableRow>
+                                                </TableHeader>
+                                                <TableBody>
+                                                    <TableRow>
+                                                        {Object.keys(device.properties).map(property => (
+
+                                                            <TableCell > {device.properties[property]} </TableCell>
+
+
+                                                        ))}
+                                                    </TableRow>
+                                                </TableBody>
+                                            </Table>
+                                        </TableCell>
+
+                                    </TableRow>)
+                                }</>
+
+
+
+                            )
+
+
+
+                        }) : ""
                     }
 
                 </TableBody>

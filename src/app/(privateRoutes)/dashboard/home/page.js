@@ -31,18 +31,26 @@ async function Renderer() {
 
     let Homes;
     let refreshToken = await getCooKies({ name: "refreshToken" });
-    let userData = jwt.decode(refreshToken.value);
+    let userData;
     let fullUserData
-    console.log(userData)
-    try {
-        response = await getUserHome();
-        Homes = await getAllHomeList();
-        fullUserData = await getUserData({ email: userData.email });
+
+    if (refreshToken && refreshToken.value) {
+        userData = jwt.decode(refreshToken.value);
+        console.log('userData', userData)
+        try {
+            response = await getUserHome();
+            Homes = await getAllHomeList();
+            fullUserData = await getUserData({ email: userData.email });
 
 
-    } catch (error) {
+        } catch (error) {
+
+        }
+    }
+    else {
 
     }
+
 
 
     async function renderHome({ myhome }) {
@@ -50,15 +58,15 @@ async function Renderer() {
         console.log('myhome', myhome)
 
         return (<div>
-            <div>
+            <div className=" text-[18px]  capitalize  font-light  font-rubik ">
                 You are {userData.role == "service_requestor" ?
                     "Service Requestor" : userData.role == "normal_user" ? "Normal User" : "admin  "} of the following Home
             </div>
-            <div className=" text-[64px] uppercase"> {myhome.homeName}</div>
+            <div className=" text-[64px] uppercase font-fraunces_600"> {myhome.homeName}</div>
 
 
             <Table  >
-                <TableCaption>A list of Devices created of user with role {userData.role == "service_requestor" ?
+                <TableCaption>A list of Devices of home for user with role {userData.role == "service_requestor" ?
                     "Service Requestor" : userData.role == "normal_user" ? "Normal User" : "admin  "}</TableCaption>
                 <TableHeader>
                     <TableRow >
@@ -113,8 +121,8 @@ async function Renderer() {
 
                 </TableBody>
             </Table>
-            <h3 className=" text-[24px] font-sigmar_one font-bold"> Requests</h3>
-            <Table  >
+            {(myhome.requests.serviceRequestors.length !== 0 || myhome.requests.normalUser.length !== 0) && <h3 className=" text-[24px] font-sigmar_one font-bold"> Requests</h3>}
+            {(myhome.requests.serviceRequestors.length !== 0 || myhome.requests.normalUser.length !== 0) && <Table  >
                 <TableCaption>A list of Request made on the home </TableCaption>
                 <TableHeader>
                     <TableRow >
@@ -172,7 +180,7 @@ async function Renderer() {
                     ))}
 
                 </TableBody>
-            </Table>
+            </Table>}
 
         </div>);
     }
@@ -188,19 +196,15 @@ async function Renderer() {
 
     else if (userData.role == "normal_user" || userData.role == 'service_requestor') {
         let filteredHome = Homes?.homeList;
-        let availableHome;
+        let availableHome = [];
         let requestedHome;
 
-        if (fullUserData.user.accessList.normalUser.length !== 0) {
-            availableHome = Homes.homeList.filter(home =>
-
-                Object.keys(fullUserData.user.accessList.normalUser).some(homeId => home.homeId == homeId)
-            )
-            availableHome = availableHome[0]
+        if (Object.keys(fullUserData.user.accessList.normalUser).length !== 0) {
+            availableHome = response.response.normalUser
 
 
         }
-        if (fullUserData.user.accessList.serviceRequestors.length !== 0) {
+        if (Object.keys(fullUserData.user.accessList.serviceRequestors).length !== 0) {
             availableHome = response.response.serviceRequestors
 
 
@@ -229,14 +233,14 @@ async function Renderer() {
 
         console.log('Homes', Homes)
         console.log('response', response.response.serviceRequestors)
-        // console.log("availableHome", availableHome)
+        console.log("availableHome", availableHome)
 
-        // console.log("requestedHome", requestedHome)
+        console.log("requestedHome", requestedHome)
         // console.log("fittered", filteredHome)
-        // console.log("fullUserData.user.requests.serviceRequestors", fullUserData.user.requests.serviceRequestors)
+        console.log("fullUserData.user.requests.serviceRequestors", fullUserData.user)
         // console.log("fullUserData.user.requests.normalUser", fullUserData.user.requests.normalUser)
 
-        if (!availableHome && !requestedHome) {
+        if (availableHome.length == 0 && !requestedHome) {
             return <div>
 
                 <div>

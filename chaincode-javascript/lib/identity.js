@@ -883,7 +883,11 @@ class UserAuthenticationContract extends Contract {
             device => user.accessList.normalUser[home.homeId].some(deviceId => device.deviceId === deviceId)
           )
           home.devices = filteredDevices;
-          home.requests = [];
+          home.requests = {
+
+            normalUser: [],
+            serviceRequestors: []
+          }
 
         })
       }
@@ -902,7 +906,11 @@ class UserAuthenticationContract extends Contract {
             device => user.accessList.serviceRequestors[home.homeId].some(deviceId => device.deviceId === deviceId)
           )
           home.devices = filteredDevices;
-          home.requests = [];
+          home.requests = {
+
+            normalUser: [],
+            serviceRequestors: []
+          };
 
         })
 
