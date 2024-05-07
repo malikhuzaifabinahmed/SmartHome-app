@@ -549,109 +549,88 @@ class UserAuthenticationContract extends Contract {
       return { isOk: false, message: error.message };
     }
   }
-
-  async updateHomeDevice(ctx, homeId, deviceName, properties1, accessToken, deviceId) {
-    let properties = JSON.parse(properties1)
+  async updateDeviceToHome(ctx, deviceId, deviceName, properties1, accessToken) {
+    let propertiesToUpdate = JSON.parse(properties1)
     try {
-      if (this.#isTokenValid(accessToken)) {
+      if (!this.#isTokenValid(accessToken)) {
         throw new Error("Invalid access token");
       }
 
       const decoded = jwt.decode(accessToken);
       const email = decoded.email;
-      const userAsBytes = await ctx.stub.getState(email);
-      if (!userAsBytes) {
-        throw new Error(`The user ${email} does not exist`);
-      }
 
-      const user = JSON.parse(userAsBytes.toString());
-
-
-      const homeAsBytes = await ctx.stub.getState(homeId);
-
-      if (!homeAsBytes) {
-        throw new Error(`The home ${homeId} does not exist`);
-      }
-
-
-      let home = JSON.parse(homeAsBytes.toString());
-      let filteredDevice = home.devices.filter(device => device.deviceId == deviceId);
-      if (filteredDevice.length == 0) {
-        throw new Error("Device does not exits on the home")
-      }
-      filteredDevice = filteredDevice[0];
-      filteredDevice.deviceName = deviceName;
-      filteredDevice.properties = properties;
-
-      return { isOk: true, device: filteredDevice };
-    } catch (error) {
-      return { isOk: false, message: error.message };
-    }
-  }
-  async updateDevice(ctx, deviceName, properties1, accessToken, deviceId) {
-    let properties = JSON.parse(properties1)
-    try {
-      if (this.#isTokenValid(accessToken)) {
-        throw new Error("Invalid access token");
-      }
-
-      const decoded = jwt.decode(accessToken);
-      const email = decoded.email;
-      const userAsBytes = await ctx.stub.getState(email);
-      if (!userAsBytes) {
-        throw new Error(`The user ${email} does not exist`);
-      }
-
-      const user = JSON.parse(userAsBytes.toString());
-
-      if (user.role !== "service_provider") {
-        throw new Error("Only service providers can update devices");
-      }
-
+      // Retrieve device and check if it exists
       const deviceAsBytes = await ctx.stub.getState(deviceId);
-
-
-
       if (!deviceAsBytes) {
-        throw new Error(`The device ${deviceId} does not exist`);
+        throw new Error(`Device with ID ${deviceId} does not exist`);
       }
+
       const device = JSON.parse(deviceAsBytes.toString());
 
-
-
-
-      let updatedDevice = {
-        docType: "device",
-        deviceId,
-        deviceName,
-        properties: properties || {},
-        owner: {
-          email: user.email,
-          firstName: user.firstName,
-          lastName: user.lastName,
-          role: user.role,
-        },
-      };
-      const deviceListBytes = await ctx.stub.getState("deviceList");
-      let deviceList = []
-
-      if (!deviceListBytes || deviceListBytes.length === 0) {
-
-      }
-      else {
-        deviceList = JSON.parse(deviceListBytes.toString());
+      // Retrieve user and check if it exists
+      const userAsBytes = await ctx.stub.getState(email);
+      if (!userAsBytes) {
+        throw new Error(`User with email ${email} does not exist`);
       }
 
-      deviceList.map(item => item.deviceId == deviceId ? device : item)
+      const user = JSON.parse(userAsBytes.toString());
 
-      await ctx.stub.putState("deviceList", Buffer.from(JSON.stringify(deviceList)));
+      let hasAccess = false;
+      if (user.role === "admin" || // Check for admin role
+        (user.role === "normal_user" || user.role === "service_requestor")) {
+        const accessList = user.accessList;
 
-      await ctx.stub.putState(deviceId, Buffer.from(JSON.stringify(device)));
+        // Check if user's home ID list in the access list has the device ID
+        if (user.role === "normal_user" && accessList.normalUser.homeId) {
+          hasAccess = accessList.normalUser.homeId.includes(deviceId);
+        } else if (user.role === "service_requestor" && accessList.serviceRequestors.homeId) {
+          hasAccess = accessList.serviceRequestors.homeId.includes(deviceId);
+        } else if (user.role === "admin" && accessList.admin === device.homeId) { // Check for admin role in home access list
+          hasAccess = true;
+        }
+      }
+
+      if (!hasAccess) {
+        throw new Error("You don't have permission to update this device");
+      }
+
+      // Update specific properties if user has access
+      for (const [key, value] of Object.entries(propertiesToUpdate)) {
+        device.properties[key] = value; // Ensure key exists before assignment
+      }
+
+      if (deviceName) {
+        device.deviceName = deviceName; // Update device name if provided
+      }
+
+      // Retrieve the home object based on the device ID
+      const homeId = device.homeId; // Assuming `device` object has a `homeId` property
+      const homeAsBytes = await ctx.stub.getState(homeId);
+      if (!homeAsBytes) {
+        throw new Error(`Home with ID ${homeId} does not exist`);
+      }
+
+      const home = JSON.parse(homeAsBytes.toString());
+
+      // Find the index of the device in the home object's devices list
+      const deviceIndex = home.devices.findIndex((existingDevice) => existingDevice.deviceId === deviceId);
+
+      if (deviceIndex === -1) {
+        throw new Error(`Device with ID ${deviceId} is not associated with Home ${homeId}`);
+      }
+
+      // Update the device in the home object's devices list
+      home.devices[deviceIndex] = device;
+
+      // Update the home object state on the blockchain
+      await ctx.stub.putState(homeId, Buffer.from(JSON.stringify(home)));
+
       return { isOk: true, updated: true, device };
     } catch (error) {
       return { isOk: false, message: error.message };
     }
   }
+
   async getAllDevicesList(ctx, accessToken) {
     try {
       if (this.#isTokenValid(accessToken)) {

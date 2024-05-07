@@ -282,6 +282,46 @@ export async function updateDevice({ deviceId, deviceName, properties }) {
     gateway.disconnect()
   }
 }
+export async function updateDeviceToHome({ deviceId, deviceName, properties }) {
+  let accessToken = await getCooKies({ name: "accessToken" });
+  if (!accessToken) {
+    throw new Error("No access token found");
+  }
+  let wallet = await buildWallet(Wallets, walletPath);
+  const gateway = new Gateway();
+  await gateway.connect(ccp, {
+    wallet,
+    identity: org1UserId,
+    discovery: { enabled: true, asLocalhost: true }, // using asLocalhost as this gateway is using a fabric network deployed locally
+  });
+  const network = await gateway.getNetwork(channelName);
+  const contract = network.getContract(chaincodeName);
+  console.log(deviceId,
+    properties,
+    accessToken)
+  try {
+    let result = await contract.submitTransaction(
+      "updateDeviceToHome",
+      deviceId,
+      deviceName,
+      JSON.stringify(properties),
+      accessToken.value,
+    );
+
+    let response = JSON.parse(result.toString());
+    console.log(response)
+    console.log(result.toString())
+    gateway.disconnect()
+    return response;
+  } catch (e) {
+    console.log("Error at  updateDevice ", e);
+    // console.log(e.responses[0].payload.toString())
+    // console.log(e.responses[1].payload.toString())
+    // console.log(e.responses[1].response.payload.toString())
+
+    gateway.disconnect()
+  }
+}
 
 export async function getAllDevicesList() {
   let accessToken = await getCooKies({ name: "accessToken" });

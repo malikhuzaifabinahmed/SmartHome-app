@@ -60,11 +60,16 @@ export default function SignupForm() {
         });
 
         localStorage.setItem("refreshToken", response.refreshToken);
-        toast("Successful Sign up.");
-        router.push('/dashboard');
-        setIsloading(false);
+
+        if (response.isOk) {
+          toast("Successful Sign up.");
+          router.push('/dashboard');
+          setIsloading(false);
+        } else {
+          throw new Error(response.message)
+        }
       } catch (error) {
-        toast("Something went wrong!");
+        toast(error);
         setIsloading(false);
       }
     },
