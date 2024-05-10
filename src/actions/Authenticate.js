@@ -282,7 +282,7 @@ export async function updateDevice({ deviceId, deviceName, properties }) {
     gateway.disconnect()
   }
 }
-export async function updateDeviceToHome({ deviceId, deviceName, properties }) {
+export async function updateDeviceToHome({ deviceId, homeId, deviceName, properties }) {
   let accessToken = await getCooKies({ name: "accessToken" });
   if (!accessToken) {
     throw new Error("No access token found");
@@ -296,13 +296,14 @@ export async function updateDeviceToHome({ deviceId, deviceName, properties }) {
   });
   const network = await gateway.getNetwork(channelName);
   const contract = network.getContract(chaincodeName);
-  console.log(deviceId,
+  console.log(deviceId, homeId,
     properties,
     accessToken)
   try {
     let result = await contract.submitTransaction(
       "updateDeviceToHome",
       deviceId,
+      homeId,
       deviceName,
       JSON.stringify(properties),
       accessToken.value,
@@ -672,7 +673,7 @@ export async function getHomeDevice({ deviceId, homeId }) {
     console.log(result.toString())
     revalidatePath('/serviceProvider/homeList/assignDevices')
     gateway.disconnect()
-    // return response;
+    return response;
   } catch (e) {
     console.log("Error at  updateDevice ", e);
     gateway.disconnect()

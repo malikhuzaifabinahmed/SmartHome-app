@@ -9,6 +9,6 @@ export default async function Page({ searchParams }) {
         let device = await getHomeDevice({ deviceId: searchParams.deviceId, homeId: searchParams.homeId })
         console.log(device)
 
-        // return <div> <UpdateDeviceForm home={searchParams.homeId} />   </div>
+        return <div> <UpdateDeviceForm device={device.device} homeId={searchParams.homeId} />   </div>
     }
 }

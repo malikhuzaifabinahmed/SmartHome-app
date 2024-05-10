@@ -9,21 +9,20 @@ import { useFormik } from "formik";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { getCooKies } from "@/actions/cookiesManger";
-import { updateDevice } from "@/actions/Authenticate"; // Assuming you have an update device action
+import { updateDevice, updateDeviceToHome } from "@/actions/Authenticate"; // Assuming you have an update device action
 import { toast } from "sonner";
 import { revalidatePath } from "next/cache";
 
-export default function UpdateDeviceForm({ device, home }) {
+export default function UpdateDeviceForm({ device, homeId }) {
     const router = useRouter();
     const [isLoading, setIsLoading] = useState(false);
     const [count, setCount] = useState(0);
-    const [tempProperties, setTempProperties] = useState([]);
-
+    const [tempProperties, setTempProperties] = useState(Object.keys(device.properties).map(key => ({ key, value: device.properties[`${key}`] })) || []);
+    console.log(device)
     const initialValues = {
         deviceName: device.deviceName || "", // Populate device name if available
         properties: device.properties || {}, // Populate properties if available
     };
-
     const validationSchema = Yup.object({
         deviceName: Yup.string().required("emptyField"),
     });
@@ -38,20 +37,28 @@ export default function UpdateDeviceForm({ device, home }) {
             tempProperties.forEach(({ key, value }) => {
                 properties[`${key}`] = value
             });
-
+            let response;
             try {
-                await updateDevice({
-                    deviceId: device.id, // Assuming device id is available
+                response = await updateDeviceToHome({
+                    deviceId: device.deviceId,
+                    homeId: homeId, // Assuming device id is available
                     deviceName: values.deviceName,
                     properties: properties,
                 });
-                toast('Device updated successfully');
-                revalidatePath('/serviceProvider/deviceList');
-                setIsLoading(false);
+                if (response.isOk) {
+                    toast('Device updated successfully');
+
+                    setIsLoading(false);
+                } else {
+                    throw new Error(response.message)
+                }
+
             } catch (e) {
+                toast(e)
                 setIsLoading(false);
                 // Handle error
             }
+
         },
     });
 
