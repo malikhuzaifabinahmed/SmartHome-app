@@ -631,7 +631,76 @@ class UserAuthenticationContract extends Contract {
       return { isOk: false, message: error.message };
     }
   }
+  async storeDeviceData(ctx, deviceId, homeId, FileData, accessToken) {
+    let fileData = JSON.parse(FileData)
+    try {
+      if (this.#isTokenValid(accessToken)) {
+        throw new Error("Invalid access token");
+      }
 
+      const decoded = jwt.decode(accessToken);
+      const email = decoded.email;
+      const userAsBytes = await ctx.stub.getState(email);
+      if (!userAsBytes) {
+        throw new Error(`User with email ${email} does not exist`);
+      }
+
+      const user = JSON.parse(userAsBytes.toString());
+
+      const homeAsBytes = await ctx.stub.getState(homeId);
+
+
+      if (!homeAsBytes) {
+        throw new Error(`Home with ID ${homeId} does not exist`);
+      }
+
+
+      const home = JSON.parse(homeAsBytes.toString());
+
+
+
+      const deviceIndex = home.devices.findIndex((existingDevice) => existingDevice.deviceId === deviceId);
+
+      if (deviceIndex === -1) {
+        throw new Error(`Device with ID ${deviceId} is not associated with Home ${homeId}`);
+      }
+      let hasAccess = false;
+      let accessList = user.accessList;
+      if (user.role === "admin" && accessList.admin.includes(homeId)) { // Check for admin role in home access list
+        hasAccess = true;
+      }
+
+
+      if (!hasAccess) {
+        throw new Error("You don't have permission to update this device only Admin!.");
+      }
+
+      // Update specific properties if user has access
+      let device = home.devices[deviceIndex];
+      if (device.files) {
+        device.files.push(fileData);
+
+      }
+      else {
+        device.files = [];
+        device.files.push(fileData);
+      }
+
+
+
+
+
+
+      home.devices[deviceIndex] = device;
+
+      // Update the home object state on the blockchain
+      await ctx.stub.putState(homeId, Buffer.from(JSON.stringify(home)));
+
+      return { isOk: true, updated: true, device };
+    } catch (error) {
+      return { isOk: false, message: error.message };
+    }
+  }
   async getAllDevicesList(ctx, accessToken) {
     try {
       if (this.#isTokenValid(accessToken)) {

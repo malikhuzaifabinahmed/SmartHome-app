@@ -12,7 +12,6 @@ import {
   fraunces_600,
 } from "@/fonts.config";
 import { cn } from "@/lib/utils";
-
 export const metadata = {
   title: "Smart Home",
   description: "Smart Home with HLF",

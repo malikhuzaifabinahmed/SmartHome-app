@@ -758,3 +758,42 @@ export async function assignDevicesToUser({ deviceId, homeId, email }) {
 
   }
 }
+
+export async function storeDeviceData({ deviceId, homeId, fileData }) {
+  let accessToken = await getCooKies({ name: "accessToken" });
+  if (!accessToken) {
+    throw new Error("No access token found");
+  }
+  let wallet = await buildWallet(Wallets, walletPath);
+  const gateway = new Gateway();
+  await gateway.connect(ccp, {
+    wallet,
+    identity: org1UserId,
+    discovery: { enabled: true, asLocalhost: true }, // using asLocalhost as this gateway is using a fabric network deployed locally
+  });
+  const network = await gateway.getNetwork(channelName);
+  const contract = network.getContract(chaincodeName);
+  console.log(deviceId, homeId,
+    fileData,
+    accessToken)
+  try {
+    let result = await contract.submitTransaction(
+      "storeDeviceData",
+      deviceId,
+      homeId,
+      JSON.stringify(fileData),
+      accessToken.value,
+    );
+
+    let response = JSON.parse(result.toString());
+    console.log(response)
+    console.log(result.toString())
+    gateway.disconnect()
+    return response;
+  } catch (e) {
+    console.log("Error at  updateDevice ", e);
+
+
+    gateway.disconnect()
+  }
+}

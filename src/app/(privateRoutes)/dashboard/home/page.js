@@ -114,6 +114,13 @@ async function Renderer() {
                                     <MyButton type='submit' variant='icon'> Edit</MyButton>
                                 </Link>
                             </TableCell>
+
+                            <TableCell >
+                                {userData.role === "admin" &&
+                                    <Link href={`/dashboard/home/uploadData?homeId=${myhome.homeId}&deviceId=${device.deviceId}`}>
+                                        <MyButton type='submit' variant='icon'> Upload data</MyButton>
+                                    </Link>}
+                            </TableCell>
                         </TableRow>
 
 
