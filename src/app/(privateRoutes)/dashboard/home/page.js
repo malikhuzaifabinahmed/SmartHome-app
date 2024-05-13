@@ -108,19 +108,27 @@ async function Renderer() {
                                         </TableRow>
                                     </TableBody>
                                 </Table>
+
                             </TableCell>
                             <TableCell>
+                                <Link href={`/dashboard/home/files?homeId=${myhome.homeId}&deviceId=${device.deviceId}`}>
+                                    <MyButton type='submit' variant='icon'> See files</MyButton>
+                                </Link>
+                            </TableCell>
+                            {userData.role == 'admin' && <><TableCell>
                                 <Link href={`/dashboard/home/updateDevice?homeId=${myhome.homeId}&deviceId=${device.deviceId}`}>
                                     <MyButton type='submit' variant='icon'> Edit</MyButton>
                                 </Link>
                             </TableCell>
 
-                            <TableCell >
-                                {userData.role === "admin" &&
-                                    <Link href={`/dashboard/home/uploadData?homeId=${myhome.homeId}&deviceId=${device.deviceId}`}>
-                                        <MyButton type='submit' variant='icon'> Upload data</MyButton>
-                                    </Link>}
-                            </TableCell>
+                                <TableCell >
+                                    {userData.role === "admin" &&
+                                        <Link href={`/dashboard/home/uploadData?homeId=${myhome.homeId}&deviceId=${device.deviceId}`}>
+                                            <MyButton type='submit' variant='icon'> Upload data</MyButton>
+                                        </Link>}
+                                </TableCell>
+                            </>
+                            }
                         </TableRow>
 
 
