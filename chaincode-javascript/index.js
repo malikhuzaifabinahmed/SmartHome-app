@@ -6,9 +6,7 @@
 
 'use strict';
 
-const assetTransfer = require('./lib/assetTransfer');
 const identity = require('./lib/identity');
 
 
-module.exports.AssetTransfer = identity;
 module.exports.contracts = [identity];
