@@ -57,11 +57,11 @@ export default async function Page({ searchParams }) {
             </div>
             <div className="mt-10 flex flex-wrap gap-10 w-full max-w-[1400px]">
 
-                {device.files && device.files.map(({ IpfsHash, Timestamp }) => (<div className="">
+                {device.files && device.files.map(({ IpfsHash, Timestamp, iv, key, name }) => (<div className="">
 
                     <div className=" flex justify-between items-center mb-5 ">
                         <h2 className=" ">{isoToCustomDate(Timestamp)} </h2>
-                        <DownloadFile CID={IpfsHash} />
+                        <DownloadFile CID={IpfsHash} ivResponse={iv} keyResponse={key} name={name} />
                     </div>
                     <p className="text-[18px]  capitalize font-rubik ">
                         Cammand Id : <span style={{ textTransform: 'none' }} className=" font-normal text-[14px]"> {IpfsHash}</span>

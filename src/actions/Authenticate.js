@@ -760,6 +760,7 @@ export async function assignDevicesToUser({ deviceId, homeId, email }) {
 }
 
 export async function storeDeviceData({ deviceId, homeId, fileData }) {
+  console.log("i am  called")
   let accessToken = await getCooKies({ name: "accessToken" });
   if (!accessToken) {
     throw new Error("No access token found");

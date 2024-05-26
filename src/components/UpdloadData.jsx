@@ -6,6 +6,35 @@ import { toast } from 'sonner';
 import { storeDeviceData } from '@/actions/Authenticate';
 
 
+function uint8ArrayToBase64(uint8Array) {
+    let binaryString = '';
+    const len = uint8Array.byteLength;
+    for (let i = 0; i < len; i++) {
+        binaryString += String.fromCharCode(uint8Array[i]);
+    }
+    return btoa(binaryString);
+}
+
+// Convert ArrayBuffer to Base64
+function arrayBufferToBase64(arrayBuffer) {
+    return uint8ArrayToBase64(new Uint8Array(arrayBuffer));
+}
+
+async function encryptFile(buffer) {
+    const key = await crypto.subtle.generateKey(
+        { name: "AES-GCM", length: 256 },
+        true,
+        ["encrypt", "decrypt"]
+    );
+    const iv = crypto.getRandomValues(new Uint8Array(12)); // Initialization vector
+    const encryptedData = await crypto.subtle.encrypt(
+        { name: "AES-GCM", iv },
+        key,
+        buffer
+    );
+    const exportedKey = await crypto.subtle.exportKey("raw", key);
+    return { encryptedData, iv, exportedKey };
+}
 function UploadData({ token, deviceId, homeId }) {
     const [file, setFile] = useState(null);
     const [uploading, setUploading] = useState(false)
@@ -28,7 +57,14 @@ function UploadData({ token, deviceId, homeId }) {
         }
         console.log(file)
         const formData = new FormData();
-        formData.append('file', file);
+        const arrayBuffer = await file.arrayBuffer();
+        const buffer = Buffer.from(arrayBuffer);
+        var { encryptedData, iv, exportedKey } = await encryptFile(buffer);
+        let EncryptedFile = new File([encryptedData], file.name)
+
+        formData.append('file', EncryptedFile);
+
+
 
         const xhr = new XMLHttpRequest();
         xhr.open('POST', url, true);
@@ -40,25 +76,44 @@ function UploadData({ token, deviceId, homeId }) {
             }
         }
 
+
         xhr.onload = async () => {
-            console.log('response', xhr.response)
-            let response = JSON.parse(xhr.response);
-            const { IpfsHash, Timestamp } = response;
-            setUploading(false)
+            try {
+                if (xhr.status >= 200 && xhr.status < 300) {
+                    const response = JSON.parse(xhr.responseText);
+                    const { IpfsHash, Timestamp } = response;
+                    setUploading(false);
+                    setStoringOnBlockchain(true);
 
-            setStoringOnBlockchain(true)
-            let res = await storeDeviceData({ deviceId: deviceId, homeId: homeId, fileData: { IpfsHash, Timestamp } })
-            toast('File uploaded successfully!');
-            setStoringOnBlockchain(false)
+                    await storeDeviceData({ deviceId, homeId, fileData: { name: file.name, IpfsHash, Timestamp, iv: uint8ArrayToBase64(iv), key: arrayBufferToBase64(exportedKey) } });
+                    console.log('fileData:', { IpfsHash, Timestamp, iv: iv, key: exportedKey })
 
-            console.log(IpfsHash, Timestamp)
-        }
+
+
+
+                    toast('File uploaded successfully!');
+                } else {
+                    console.error('Upload failed', xhr.responseText);
+                    toast('File upload failed.');
+                }
+            } catch (error) {
+                console.error('Error parsing response', error);
+                toast('File upload failed.');
+            } finally {
+                setUploading(false);
+                setStoringOnBlockchain(false);
+            }
+        };
+
         xhr.onerror = () => {
             toast('File upload failed.');
             setStoringOnBlockchain(false)
             setUploading(false)
         }
         setXhrObject(xhr);
+        console.log('formData', formData)
+
+
         xhr.send(formData)
 
     };
