@@ -9,8 +9,8 @@ import { User2 } from "lucide-react";
 import jwt from 'jsonwebtoken'
 import { logout } from "@/actions/Authenticate";
 export default async function Header() {
-  let refreshToken = await getCooKies({name:"refreshToken"});
-  if(refreshToken ){
+  let refreshToken = await getCooKies({ name: "refreshToken" });
+  if (refreshToken) {
     var userData = jwt.decode(refreshToken)
     console.log(userData)
   }
@@ -34,19 +34,50 @@ export default async function Header() {
             />
           </div>
         </Link>
-      {!refreshToken &&  <Link
-          href={"/login"}
-          className={cn(
-            "bg-secondary/40",
-            myButtonVariants({ variant: "ghost" })
-          )}
-        >
-          Login
-        </Link>}
-        {refreshToken && userData&&  <User2/> + <> {userData.firstName }</>   }
-        {refreshToken && <form action={logout}>
-          <MyButton type="submit" >Logout</MyButton>
-        </form>}
+
+
+        <div className=" flex gap-5">
+          {!refreshToken && <Link
+            href={"/login"}
+            className={cn(
+              "bg-secondary/40",
+              myButtonVariants({ variant: "ghost" })
+            )}
+          >
+            Login
+          </Link>}
+          {refreshToken && userData && <User2 /> + <> {userData.firstName}</>}
+          {refreshToken && <form action={logout}>
+            <MyButton type="submit" >Logout</MyButton>
+          </form>}
+          <Link
+            href={"/about"}
+            className={cn(
+              " capitalize bg-secondary/40",
+              myButtonVariants({ variant: "ghost" })
+            )}
+          >
+            About
+          </Link>
+          <Link
+            href={"/services"}
+            className={cn(
+              " capitalize bg-secondary/40",
+              myButtonVariants({ variant: "ghost" })
+            )}
+          >
+            Services
+          </Link>
+          <Link
+            href={"/contact"}
+            className={cn(
+              " capitalize bg-secondary/40",
+              myButtonVariants({ variant: "ghost" })
+            )}
+          >
+            contact
+          </Link>
+        </div>
       </div>
     </MaxWidthWrapper>
   );

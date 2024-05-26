@@ -185,7 +185,7 @@ export default function SignupForm() {
           />
         </div>
 
-        <MyButton type="submit" className=" min-[320px]:w-[246px] self-center">
+        <MyButton disabled={isLoading} type="submit" className=" min-[320px]:w-[246px] self-center">
           {isLoading && <RotateCw className="mr-2 h-4 w-4 animate-spin" />}
           {!isLoading && "Sign up"}
         </MyButton>
@@ -193,7 +193,7 @@ export default function SignupForm() {
           Already have an account?
           <span>
             <Link href={"/login"}>
-              <MyButton variant="link">Login</MyButton>
+              <MyButton type={'button'} variant="link">Login</MyButton>
             </Link>
           </span>
         </div>

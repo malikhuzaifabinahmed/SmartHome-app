@@ -94,6 +94,7 @@ export default function LoginForm() {
         }
       />
       <MyButton
+        disabled={isLoading}
         type="submit"
         className={cn(
           "w-full flex gap-5 items-center max-w-[120px] mx-auto",

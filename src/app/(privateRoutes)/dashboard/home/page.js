@@ -18,6 +18,7 @@ import { objectsPresentInAOnly } from "@/lib/utils";
 import { Suspense } from "react";
 import Loading from "@/app/loading";
 import { object } from "yup";
+import { LoadingProvider } from "@/Context/LoadingContext";
 export default async function Page() {
     return <Suspense fallback={<Loading />}>
         <div className="p-5">
@@ -311,8 +312,9 @@ async function Renderer() {
                                         </Table>
                                     </TableCell>
                                     <TableCell>
-                                        <RequestButton homeId={device.homeId} deviceId={"12"} />
-
+                                        <LoadingProvider>
+                                            <RequestButton homeId={device.homeId} deviceId={"12"} />
+                                        </LoadingProvider>
                                     </TableCell>
                                 </TableRow>
 

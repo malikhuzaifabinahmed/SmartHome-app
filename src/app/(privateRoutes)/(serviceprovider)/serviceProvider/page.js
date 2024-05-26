@@ -6,13 +6,14 @@ import AddDevice from "@/components/AddDevice";
 import { getCooKies } from "@/actions/cookiesManger";
 import DeviceForm from "@/components/Forms/DeviceForm";
 import { getAllDevicesList } from "@/actions/Authenticate";
+import HomePageWelcome from "../../../../components/HomePageWelcome";
 
 export default async function Page() {
-  console. log('some',await getCooKies({name:'some'}))
+  console.log('some', await getCooKies({ name: 'some' }))
 
   return (
-    <div className="  ">
-     Welcome to Dashboard 
+    <div className="   ">
+      <HomePageWelcome />
     </div>
   );
 }

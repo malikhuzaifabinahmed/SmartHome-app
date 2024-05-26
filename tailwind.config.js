@@ -71,7 +71,6 @@ module.exports = {
           from: { width: 0, height: 0 },
           to: { width: "100%", height: "100%" },
         },
-
         "accordion-down": {
           from: { height: "0" },
           to: { height: "var(--radix-accordion-content-height)" },
@@ -80,11 +79,36 @@ module.exports = {
           from: { height: "var(--radix-accordion-content-height)" },
           to: { height: "0" },
         },
+        bounce: {
+          '0%, 100%': {
+            transform: 'translateY(-10%)',
+            animationTimingFunction: 'cubic-bezier(0.8,0,1,1)',
+          },
+          '50%': {
+            transform: 'translateY(0)',
+            animationTimingFunction: 'cubic-bezier(0,0,0.2,1)',
+          },
+        },
+        fadeIn: {
+          '0%': { opacity: 0 },
+          '100%': { opacity: 1 },
+        },
+        fadeOut: {
+          '0%': { opacity: 1 },
+          '100%': { opacity: 0 },
+        },
+        translateY: {
+          ' 50%': { transform: 'translateY(10px)' },
+        },
       },
       animation: {
-        slideIn: "slide 2s ease-out ",
+        slideIn: "slide 2s ease-out",
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        bounce: "bounce 1s infinite",
+        fadeIn: "fadeIn 1s ease-out",
+        fadeOut: "fadeOut 0.5s ease-in-out ",
+        translateY: "translateY 2.5s ease-in-out infinite",
       },
     },
   },

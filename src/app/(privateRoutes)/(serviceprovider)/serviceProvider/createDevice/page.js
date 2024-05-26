@@ -1,17 +1,17 @@
 import DeviceForm from "@/components/Forms/DeviceForm";
 import MaxWidthWrapper from "@/components/MaxWidthWrapper";
 
-export default function Page(){
-    return  <div className="  ">
-    <MaxWidthWrapper>
-      <div className="text-[2.5rem] font-fraunces_bold "> Smart Home</div>
-
-      <div className=" border shadow-lg pb-5 md:pb-10 rounded-sm">
-        <div className=" flex justify-between py-5 my-2 mx-2 rounded-sm items-center border  px-5 ">
-      
+export default function Page() {
+  return (
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+      <MaxWidthWrapper>
+        <div className="text-center text-[2.5rem] font-fraunces_bold text-gray-900 mb-8">
+          Smart Home
         </div>
-      <DeviceForm/>
-      </div>
-    </MaxWidthWrapper>
-  </div>
+        <div className="bg-white shadow-lg rounded-lg p-8">
+          <DeviceForm />
+        </div>
+      </MaxWidthWrapper>
+    </div>
+  );
 }
