@@ -19,6 +19,7 @@
     "@radix-ui/react-select": "^2.0.0",
     "@radix-ui/react-slot": "^1.0.2",
     "class-variance-authority": "^0.7.0",
+    "classnames": "^2.5.1",
     "clsx": "^2.1.0",
     "fabric-ca-client": "^2.2.19",
     "fabric-network": "^2.2.19",

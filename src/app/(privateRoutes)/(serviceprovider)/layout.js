@@ -2,6 +2,7 @@ import { logout } from "@/actions/Authenticate";
 import MyButton from "@/components/ui/MyButton";
 import Image from "next/image";
 import Link from "next/link";
+import { ServiceProvderNavigaton } from "./ServiceProvderNavigaton";
 
 export default function Layout({ children }) {
 
@@ -23,22 +24,7 @@ export default function Layout({ children }) {
         </Link>
       </div>
 
-      <div className="flex flex-1 flex-col items-center  gap-5 justify-center">
-        <Link className='text-white  py-2 px-3 text-center hover:bg-accent rounded-md hover:text-accent-foreground ' href='/serviceProvider/createDevice'>
-          New Device
-        </Link>
-        <Link className='text-white  py-2 px-3 text-center hover:bg-accent rounded-md hover:text-accent-foreground ' href='/serviceProvider/createHome'>
-          New Home
-        </Link>
-        <Link className='text-white  py-2 px-3 text-center hover:bg-accent rounded-md hover:text-accent-foreground ' href='/serviceProvider/deviceList'>
-          Device List
-        </Link>
-
-        <Link className='text-white  py-2 px-3 text-center hover:bg-accent rounded-md hover:text-accent-foreground ' href='/serviceProvider/homeList'>
-          Home List
-        </Link>
-
-      </div>
+      <ServiceProvderNavigaton />
       <form className='mx-auto  ' action={logout}>
         <MyButton variant='secondary' type="submit" >Logout</MyButton>
       </form>
@@ -46,3 +32,5 @@ export default function Layout({ children }) {
     <div className="   w-[80%]  overflow-y-scroll">{children}</div>
   </div>
 }
+
+
