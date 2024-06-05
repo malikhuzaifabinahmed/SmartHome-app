@@ -32,11 +32,11 @@ export default function HomeForm({ user }) {
     homeName: Yup.string().required("emptyField"),
     ownerEmail: Yup.string().email("invalidEmail").required("emptyField"),
     properties: Yup.object().test(
-      'properties-test',
-      'All properties must have keys and values',
+      'emptyField',
+      'emptyField',
       (value) => {
         if (!value) return true;
-        return Object.keys(value).every((key) => key.trim() !== '' && value[key].trim() !== '');
+        return Object.keys(value).every((key) => key && (key !== '' && value[key] !== ''));
       }
     ),
   });
@@ -76,6 +76,7 @@ export default function HomeForm({ user }) {
                 ownerEmail: values.ownerEmail
               });
               toast('Home created successfully');
+              router.push("/serviceProvider/homeList");
               revalidatePath('/serviceProvider/homeList');
             } else {
               toast(response.message);

@@ -2,6 +2,25 @@
 @tailwind components;
 @tailwind utilities;
 
+progress::-moz-progress-bar {
+  background: #7c3aed;
+  border-top-right-radius: 8px;
+  border-bottom-right-radius: 8px;
+}
+
+
+progress::-moz-placeholder {
+  background: #7c3aed;
+  border-top-right-radius: 8px;
+  border-bottom-right-radius: 8px;
+}
+
+progress::-webkit-progress-value {
+  background: #7c3aed;
+  border-top-right-radius: 8px;
+  border-bottom-right-radius: 8px;
+}
+
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -53,6 +72,7 @@
   * {
     @apply border-border;
   }
+
   body {
     @apply bg-background text-foreground;
   }

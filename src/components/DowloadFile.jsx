@@ -33,7 +33,7 @@ function base64ToArrayBuffer(base64) {
 }
 
 export default function DownloadFile({ CID, ivResponse, keyResponse, name }) {
-
+    const [open, setOpen] = useState(false)
 
     console.log('her', CID, ivResponse, keyResponse)
     const url = 'https://aquamarine-deliberate-ant-681.mypinata.cloud/ipfs/' + CID;
@@ -43,6 +43,7 @@ export default function DownloadFile({ CID, ivResponse, keyResponse, name }) {
 
 
     async function handleDownload(filename) {
+        setOpen(true)
         setIsloading(true)
         console.log('filename', filename)
 
@@ -71,7 +72,8 @@ export default function DownloadFile({ CID, ivResponse, keyResponse, name }) {
             xhr.onprogress = (event) => {
                 if (event.lengthComputable) {
                     const percentComplete = (event.loaded / event.total) * 100;
-                    setDownloadProgress(percentComplete);
+                    console.log(percentComplete)
+                    setDownloadProgress(() => percentComplete);
                 }
             };
 
@@ -122,17 +124,19 @@ export default function DownloadFile({ CID, ivResponse, keyResponse, name }) {
                         await writableStream.write(decryptedBlob);
                         await writableStream.close();
                     }
-                    toast("File downloaded successfully");
+                    toast("File downloaded successfully"); setOpen(false)
                     setDownloadProgress(0);
                 } else {
                     toast(`File download failed: ${xhr.statusText}`);
                     setDownloadProgress(0);
+                    setOpen(false)
                 }
             };
 
             xhr.onerror = () => {
                 toast("File download failed");
                 setDownloadProgress(0);
+                setOpen(false)
             };
 
             xhr.send();
@@ -142,6 +146,9 @@ export default function DownloadFile({ CID, ivResponse, keyResponse, name }) {
         } catch (error) {
             toast(`File download failed: ${error.message}`);
             setDownloadProgress(0);
+            setOpen(false)
+
+
         }
 
 
@@ -179,10 +186,16 @@ export default function DownloadFile({ CID, ivResponse, keyResponse, name }) {
             throw new Error("Decryption failed. Please check your key and IV.");
         }
     };
-    return <MyButton onClick={() => handleDownload(CID)} className=' h-8'>
-        {!isLoading && <Download className=' h-5' />}
-        {downloadProgress > 0 && downloadProgress < 100 && <progress value={downloadProgress} />}
-        {isLoading && <Loader2Icon className=" animate-spin h-5 " />}
-    </MyButton>
+    return <div>
+        {open && <dialog className="bg-background my-auto mx-auto py-20 animate-fadeIn flex flex-col w-full max-w-[400px] border border-black rounded-2xl items-center justify-center">
+            <h2 className="font-semibold">Download Progress</h2>
+            {<progress className=" border border-black animate-fadeIn fill-inherit   bg-background " value={downloadProgress / 100} />}
+
+        </dialog>}
+        <MyButton disabled={open} onClick={() => handleDownload(CID)} className=' h-8'>
+            {!isLoading && <Download className=' h-5' />}
+            {isLoading && <Loader2Icon className=" animate-spin h-5 " />}
+        </MyButton>
+    </div>
 
 }

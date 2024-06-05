@@ -65,139 +65,139 @@ async function Renderer() {
             </div>
             <div className=" text-[64px] uppercase font-fraunces_600"> {myhome.homeName}</div>
 
+            <LoadingProvider>
+                <Table  >
+                    <TableCaption>A list of Devices of home for user with role {userData.role == "service_requestor" ?
+                        "Service Requestor" : userData.role == "normal_user" ? "Normal User" : "admin  "}</TableCaption>
+                    <TableHeader>
+                        <TableRow >
+                            <TableHead className="w-[100px]  whitespace-nowrap">Device Name</TableHead>
+                            <TableHead className="w-full">Properties</TableHead>
 
-            <Table  >
-                <TableCaption>A list of Devices of home for user with role {userData.role == "service_requestor" ?
-                    "Service Requestor" : userData.role == "normal_user" ? "Normal User" : "admin  "}</TableCaption>
-                <TableHeader>
-                    <TableRow >
-                        <TableHead className="w-[100px]  whitespace-nowrap">Device Name</TableHead>
-                        <TableHead className="w-full">Properties</TableHead>
-
-                    </TableRow>
-                </TableHeader>
-                <TableBody>
-                    {myhome.devices.map(device => (
-
-
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        {myhome.devices.map(device => (
 
 
-                        <TableRow>
-                            <TableCell className="font-medium ">{device.deviceName}</TableCell>
-
-                            <TableCell className="w-full   overflow-x-scroll ">
-
-                                <Table className="w-fit whitespace-nowrap" >
-                                    <TableHeader>
-                                        <TableRow>
-                                            {Object.keys(device.properties).map(property => (
-
-                                                <TableHead > {property} </TableHead>
 
 
-                                            ))}
-                                        </TableRow>
-                                    </TableHeader>
-                                    <TableBody>
-                                        <TableRow>
-                                            {Object.keys(device.properties).map(property => (
+                            <TableRow>
+                                <TableCell className="font-medium ">{device.deviceName}</TableCell>
 
-                                                <TableCell > {device.properties[property]} </TableCell>
+                                <TableCell className="w-full   overflow-x-scroll ">
+
+                                    <Table className="w-fit whitespace-nowrap" >
+                                        <TableHeader>
+                                            <TableRow>
+                                                {Object.keys(device.properties).map(property => (
+
+                                                    <TableHead > {property} </TableHead>
 
 
-                                            ))}
-                                        </TableRow>
-                                    </TableBody>
-                                </Table>
+                                                ))}
+                                            </TableRow>
+                                        </TableHeader>
+                                        <TableBody>
+                                            <TableRow>
+                                                {Object.keys(device.properties).map(property => (
 
-                            </TableCell>
-                            <TableCell>
-                                <Link href={`/dashboard/home/files?homeId=${myhome.homeId}&deviceId=${device.deviceId}`}>
-                                    <MyButton type='submit' variant='icon'> See files</MyButton>
-                                </Link>
-                            </TableCell>
-                            {userData.role == 'admin' && <><TableCell>
-                                <Link href={`/dashboard/home/updateDevice?homeId=${myhome.homeId}&deviceId=${device.deviceId}`}>
-                                    <MyButton type='submit' variant='icon'> Edit</MyButton>
-                                </Link>
-                            </TableCell>
+                                                    <TableCell > {device.properties[property]} </TableCell>
 
-                                <TableCell >
-                                    {userData.role === "admin" &&
-                                        <Link href={`/dashboard/home/uploadData?homeId=${myhome.homeId}&deviceId=${device.deviceId}`}>
-                                            <MyButton type='submit' variant='icon'> Upload data</MyButton>
-                                        </Link>}
+
+                                                ))}
+                                            </TableRow>
+                                        </TableBody>
+                                    </Table>
+
                                 </TableCell>
-                            </>
-                            }
+                                <TableCell>
+                                    <Link href={`/dashboard/home/files?homeId=${myhome.homeId}&deviceId=${device.deviceId}`}>
+                                        <MyButton type='submit' variant='icon'> See files</MyButton>
+                                    </Link>
+                                </TableCell>
+                                {userData.role == 'admin' && <><TableCell>
+                                    <Link href={`/dashboard/home/updateDevice?homeId=${myhome.homeId}&deviceId=${device.deviceId}`}>
+                                        <MyButton type='submit' variant='icon'> Edit</MyButton>
+                                    </Link>
+                                </TableCell>
+
+                                    <TableCell >
+                                        {userData.role === "admin" &&
+                                            <Link href={`/dashboard/home/uploadData?homeId=${myhome.homeId}&deviceId=${device.deviceId}`}>
+                                                <MyButton type='submit' variant='icon'> Upload data</MyButton>
+                                            </Link>}
+                                    </TableCell>
+                                </>
+                                }
+                            </TableRow>
+
+
+                        ))}
+
+                    </TableBody>
+                </Table>
+                {(myhome.requests.serviceRequestors.length !== 0 || myhome.requests.normalUser.length !== 0) && <h3 className=" text-[24px] font-sigmar_one font-bold"> Requests</h3>}
+                {(myhome.requests.serviceRequestors.length !== 0 || myhome.requests.normalUser.length !== 0) && <Table  >
+                    <TableCaption>A list of Request made on the home </TableCaption>
+                    <TableHeader>
+                        <TableRow >
+                            <TableHead className="w-[200px]  whitespace-nowrap">Requestor Email</TableHead>
+
+                            <TableHead className="w-[100px]  whitespace-nowrap">Requestor role</TableHead>
+
                         </TableRow>
-
-
-                    ))}
-
-                </TableBody>
-            </Table>
-            {(myhome.requests.serviceRequestors.length !== 0 || myhome.requests.normalUser.length !== 0) && <h3 className=" text-[24px] font-sigmar_one font-bold"> Requests</h3>}
-            {(myhome.requests.serviceRequestors.length !== 0 || myhome.requests.normalUser.length !== 0) && <Table  >
-                <TableCaption>A list of Request made on the home </TableCaption>
-                <TableHeader>
-                    <TableRow >
-                        <TableHead className="w-[200px]  whitespace-nowrap">Requestor Email</TableHead>
-
-                        <TableHead className="w-[100px]  whitespace-nowrap">Requestor role</TableHead>
-
-                    </TableRow>
-                </TableHeader>
-                <TableBody>
-                    {myhome.requests.normalUser.map(normalUser => (
+                    </TableHeader>
+                    <TableBody>
+                        {myhome.requests.normalUser.map(normalUser => (
 
 
 
 
-                        <TableRow>
-                            <TableCell className="font-medium ">{normalUser}</TableCell>
+                            <TableRow>
+                                <TableCell className="font-medium ">{normalUser}</TableCell>
 
-                            <TableCell className="w-full   overflow-x-scroll ">
+                                <TableCell className="w-full   overflow-x-scroll ">
 
-                                Normal User
-                            </TableCell>
-                            <TableCell>
-                                <Link href={`/dashboard/home/assignDevices?homeId=${myhome.homeId}&email=${normalUser}`}>
-                                    <MyButton type='submit' variant='icon'> Give Access</MyButton>
-                                </Link>
-                            </TableCell>
-                        </TableRow>
-
-
-                    ))}
-
-                </TableBody>
-                <TableBody>
-                    {myhome.requests.serviceRequestors.map(reqeustor => (
+                                    Normal User
+                                </TableCell>
+                                <TableCell>
+                                    <Link href={`/dashboard/home/assignDevices?homeId=${myhome.homeId}&email=${normalUser}`}>
+                                        <MyButton type='submit' variant='icon'> Give Access</MyButton>
+                                    </Link>
+                                </TableCell>
+                            </TableRow>
 
 
+                        ))}
+
+                    </TableBody>
+                    <TableBody>
+                        {myhome.requests.serviceRequestors.map(reqeustor => (
 
 
-                        <TableRow>
-                            <TableCell className="font-medium ">{reqeustor}</TableCell>
-
-                            <TableCell className="w-full   overflow-x-scroll ">
-
-                                Service requestor
-                            </TableCell>
-                            <TableCell>
-                                <Link href={`/dashboard/home/assignDevices?homeId=${myhome.homeId}&email=${reqeustor}`}>
-                                    <MyButton type='submit' variant='icon'> Give Access</MyButton>
-                                </Link>
-                            </TableCell>
-                        </TableRow>
 
 
-                    ))}
+                            <TableRow>
+                                <TableCell className="font-medium ">{reqeustor}</TableCell>
 
-                </TableBody>
-            </Table>}
+                                <TableCell className="w-full   overflow-x-scroll ">
 
+                                    Service requestor
+                                </TableCell>
+                                <TableCell>
+                                    <Link href={`/dashboard/home/assignDevices?homeId=${myhome.homeId}&email=${reqeustor}`}>
+                                        <MyButton type='submit' variant='icon'> Give Access</MyButton>
+                                    </Link>
+                                </TableCell>
+                            </TableRow>
+
+
+                        ))}
+
+                    </TableBody>
+                </Table>}
+            </LoadingProvider>
         </div>);
     }
 
@@ -312,9 +312,7 @@ async function Renderer() {
                                         </Table>
                                     </TableCell>
                                     <TableCell>
-                                        <LoadingProvider>
-                                            <RequestButton homeId={device.homeId} deviceId={"12"} />
-                                        </LoadingProvider>
+                                        <RequestButton homeId={device.homeId} deviceId={"12"} />
                                     </TableCell>
                                 </TableRow>
 

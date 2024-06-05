@@ -5,9 +5,10 @@ import { useLoading } from '@/Context/LoadingContext';
 import { sendRequest } from '@/actions/Authenticate';
 import MyButton from './ui/MyButton';
 import { RotateCw } from 'lucide-react';
+import { useAssignStore } from '@/stores/DeviceStore';
 
 export default function RequestButton({ homeId, deviceId }) {
-    const { isDisabled, setIsDisabled } = useLoading();
+    const { isDisabled, setIsDisabled } = useAssignStore(state => state)
     const [isLoading, setIsLoading] = useState(false);
 
     const handleClick = async () => {
@@ -36,7 +37,7 @@ export default function RequestButton({ homeId, deviceId }) {
             className="flex items-center justify-center"
         >
             {isLoading && <RotateCw className="mr-2 h-4 w-4 animate-spin" />}
-            Request Access
+            {!isLoading && '  Request Access'}
         </MyButton>
     );
 }

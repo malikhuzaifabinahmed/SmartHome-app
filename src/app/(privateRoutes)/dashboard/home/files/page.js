@@ -45,9 +45,7 @@ export default async function Page({ searchParams }) {
             <h2 className="text-[24px] font-rubik ">
                 Device Name : <span className="text-[24px] font-normal "> {device.deviceName}</span>
             </h2>
-            <p className="text-[18px] mt-3 font-rubik ">
-                Device Id : <span className=" font-normal text-[14px]"> {device.deviceId}</span>
-            </p>
+
             <div className="mt-10 flex flex-wrap gap-5 w-full max-w-[900px]">
 
                 {Object.keys(device.properties).map((key) => (<p className="text-[18px]  capitalize font-rubik ">

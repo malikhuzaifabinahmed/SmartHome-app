@@ -28,8 +28,8 @@ export default async function Page() {
 
     return (
         <div className="overflow-hidden p-4">
-            <h1 className="text-2xl font-fraunces_semibold text-[clamp(24px,5vw,60px)] text-gray-900 mb-4">Home List</h1>
-            <div >
+            <h1 className=" font-fraunces_semibold text-[clamp(24px,5vw,60px)] mt-10 mx-auto w-fit  text-gray-900 mb-10">Home List</h1>
+            <div className=" mx-10 border px-5 border-black rounded-2xl h-full" >
                 <Table>
                     <TableCaption>A list of homes managed by the Service Provider</TableCaption>
                     <TableHeader>
@@ -41,9 +41,9 @@ export default async function Page() {
                             <TableHead className="w-[100px] sticky top-0 bg-white">Actions</TableHead>
                         </TableRow>
                     </TableHeader>
-                    <TableBody>
+                    <TableBody className='mt-10'>
                         {response.homeList.map((home, index) => (
-                            <TableRow key={home.homeId}>
+                            <TableRow key={home.homeId} className={index % 2 == 0 ? 'bg-grey-400' : "bg-white"}>
                                 <TableCell className="font-medium">{home.homeName}</TableCell>
                                 <TableCell className="font-medium">{home.owner.firstName + " " + home.owner.lastName}</TableCell>
                                 <TableCell className="font-medium">{home.owner.email}</TableCell>

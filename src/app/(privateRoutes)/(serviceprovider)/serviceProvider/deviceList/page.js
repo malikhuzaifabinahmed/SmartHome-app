@@ -27,16 +27,16 @@ export default async function Page() {
 
     return (
         <div className="overflow-hidden p-4">
-            <h1 className="text-2xl font-bold mb-4">Device List</h1>
+            <h1 className=" font-fraunces_semibold text-[clamp(24px,5vw,60px)] font-bold my-10 w-fit mx-auto mb-4">Device List</h1>
             <div className="">
                 <Table>
                     <TableCaption>A list of devices created by the Service Provider</TableCaption>
                     <TableHeader>
                         <TableRow>
-                            <TableHead className="w-[50px] sticky top-0 bg-white">#</TableHead>
-                            <TableHead className="w-[150px] sticky top-0 bg-white whitespace-nowrap">Device Name</TableHead>
-                            <TableHead className="w-full sticky top-0 bg-white">Properties</TableHead>
-                            <TableHead className="w-[100px] sticky top-0 bg-white">Actions</TableHead>
+                            <TableHead className="w-[50px] text-[16px] sticky top-0 bg-white">#</TableHead>
+                            <TableHead className="w-[150px] text-[20px] sticky top-0 bg-white whitespace-nowrap">Device Name</TableHead>
+                            <TableHead className="w-full sticky  text-[20px] top-0 bg-white">Properties</TableHead>
+                            <TableHead className="w-[100px] sticky text-[20px] top-0 bg-white">Actions</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>

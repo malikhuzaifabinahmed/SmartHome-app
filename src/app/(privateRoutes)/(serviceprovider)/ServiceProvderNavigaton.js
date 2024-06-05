@@ -9,16 +9,16 @@ export function ServiceProvderNavigaton() {
 
     return (
         <div className="flex flex-1 flex-col items-center gap-5 justify-center">
-            <Link className={'text-white py-2 px-3 text-center hover:bg-accent rounded-md hover:text-accent-foreground' + (pathName.includes('createDevice') ? " bg-white text-black" : "")} href='/serviceProvider/createDevice'>
+            <Link className={' py-2 px-3 text-center hover:bg-accent rounded-md hover:text-accent-foreground' + (pathName.includes('createDevice') ? " bg-white text-black" : " text-white")} href='/serviceProvider/createDevice'>
                 New Device
             </Link>
-            <Link className={'text-white py-2 px-3 text-center hover:bg-accent rounded-md hover:text-accent-foreground' + (pathName.includes('createHome') ? " bg-white text-black" : "")} href='/serviceProvider/createHome'>
+            <Link className={' py-2 px-3 text-center hover:bg-accent rounded-md hover:text-accent-foreground' + (pathName.includes('createHome') ? " bg-white text-black" : " text-white")} href='/serviceProvider/createHome'>
                 New Home
             </Link>
-            <Link className={'text-white py-2 px-3 text-center hover:bg-accent rounded-md hover:text-accent-foreground' + (pathName.includes('deviceList') ? " bg-white text-black" : "")} href='/serviceProvider/deviceList'>
+            <Link className={' py-2 px-3 text-center hover:bg-accent rounded-md hover:text-accent-foreground' + (pathName.includes('deviceList') ? " bg-white text-black" : " text-white")} href='/serviceProvider/deviceList'>
                 Device List
             </Link>
-            <Link className={'text-white py-2 px-3 text-center hover:bg-accent rounded-md hover:text-accent-foreground' + (pathName.includes('homeList') ? " bg-white text-black" : "")} href='/serviceProvider/homeList'>
+            <Link className={' py-2 px-3 text-center hover:bg-accent rounded-md hover:text-accent-foreground' + (pathName.includes('homeList') ? " bg-white text-black" : " text-white")} href='/serviceProvider/homeList'>
                 Home List
             </Link>
         </div>
